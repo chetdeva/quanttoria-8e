@@ -6,10 +6,9 @@ export function SiteFooter() {
     <footer className="border-t border-border py-12">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 sm:px-6 md:flex-row md:items-start md:justify-between">
         <div className="flex max-w-sm flex-col gap-3">
-          <Logo />
+          <Logo variant="full" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            {site.tagline}. Live online math classes for grades 1 to 8, taught by{' '}
-            {site.owner.name}.
+            Live online math classes for grades 1 to 8, taught by {site.owner.name}.
           </p>
         </div>
 

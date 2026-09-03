@@ -30,13 +30,13 @@ export const metadata: Metadata = {
     'Princy Sugandh',
   ],
   openGraph: {
-    title: 'Quanttoria | Unlock the World of Math Excellence',
+    title: 'Quanttoria | Empowering Global Minds with Mathematics',
     description:
       'Live online math classes that turn number-fear into confidence. 9000+ hours of teaching experience. Book a free trial.',
     type: 'website',
   },
   icons: {
-    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    icon: [{ url: '/icon.png', type: 'image/png' }],
     apple: '/apple-icon.png',
   },
 }

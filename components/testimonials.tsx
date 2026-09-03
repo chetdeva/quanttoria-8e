@@ -2,28 +2,42 @@ import { ExternalLink, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { site } from '@/lib/site'
 
-/**
- * PLACEHOLDER REVIEWS: replace each entry with the real Trustpilot review text,
- * reviewer name and location. Keep `rating` between 1 and 5.
- */
 const reviews = [
   {
-    name: 'Parent of a Grade 4 student',
-    location: 'Sydney, Australia',
+    name: 'Chandan Kumar Anjani',
+    location: 'United States',
     rating: 5,
-    text: 'Placeholder review. Replace this with a real Trustpilot review about how the classes helped your child with fractions and confidence.',
+    text: 'I started with a demo class with Ms Princy Sugandh. My daughters got so much involved in the first class that she wanted to join because of the demo class only. We are close to completing 1 year with Princy. I felt she pushes my daughter to get the best out of her and sets a pretty high standard in teaching. She puts a lot of effort not only into improving her in the subject she is teaching, but otherwise as well. She appreciates a good job and gives feedback to parents when needed to help improve as well. Thanks for being her teacher.',
   },
   {
-    name: 'Parent of a Grade 7 student',
-    location: 'Dubai, UAE',
+    name: 'Parent',
+    location: 'United States',
     rating: 5,
-    text: 'Placeholder review. Replace this with a real Trustpilot review about Olympiad preparation and Princy\u2019s teaching style.',
+    text: 'Ms Princy Sugandh has been our son’s math teacher for the past year. We have seen our child’s math skill set improve considerably under her guidance. She is punctual, stern, helps him problem solve as well as encourages him to critically think before tackling problems. She has set high expectations for our child and puts a lot of effort into her teaching each class. We are very grateful to having her as our son’s teacher, for her expertise and her commitment towards our child.',
   },
   {
-    name: 'Parent of a Grade 2 student',
-    location: 'Bengaluru, India',
+    name: 'Shilpi',
+    location: 'United States',
     rating: 5,
-    text: 'Placeholder review. Replace this with a real Trustpilot review about how a young child started enjoying math.',
+    text: 'Thank you Miss Princy Sugandh for teaching my kid math in an amazing style. He is very happy to learn all the new techniques. Thank you once again.',
+  },
+  {
+    name: 'Georgene Rondero',
+    location: 'United States',
+    rating: 5,
+    text: 'My son, who is autistic with learning disabilities, is really doing well all due to his fantastic instructor, Princy Sugandh. She is so patient and kind, but firm and demands that he always performs his best. I would wholeheartedly recommend this program for anyone!',
+  },
+  {
+    name: 'Parent',
+    location: 'United States',
+    rating: 5,
+    text: 'Ms Princy Sugandh was my son’s teacher. She was an excellent teacher, very patient with my son — he is autistic, it was challenging during some classes but she handled it very well. My son loved her classes and she became a trusted advisor for me as well in regards to ways of handling his condition. She is very detailed. Thank you Ms Princy for being a part of his learning!',
+  },
+  {
+    name: 'Gaya N.',
+    location: 'Canada',
+    rating: 5,
+    text: 'Princy is an amazing teacher, very assertive and goal oriented with my son. She challenges him to be his best.',
   },
 ]
 
@@ -64,10 +78,10 @@ export function Testimonials() {
           </Button>
         </div>
 
-        <ul className="grid gap-5 md:grid-cols-3">
+        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {reviews.map((r) => (
             <li
-              key={r.name + r.location}
+              key={r.name + r.text.slice(0, 24)}
               className="flex flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border"
             >
               <Stars count={r.rating} />

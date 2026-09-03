@@ -6,13 +6,14 @@ import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { navLinks, site, whatsappLink } from '@/lib/site'
 import { Logo } from '@/components/logo'
+import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
 
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/90 backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-[4.25rem] w-full max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="#top" className="flex items-center gap-2" aria-label={`${site.name} home`}>
           <Logo />
         </Link>
@@ -34,6 +35,7 @@ export function SiteHeader() {
             className="rounded-full font-bold"
             nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
           >
+            <WhatsAppIcon variant="white" className="size-4" />
             Book a free trial
           </Button>
         </div>
@@ -70,6 +72,7 @@ export function SiteHeader() {
             className="mt-2 rounded-full font-bold"
             nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
           >
+            <WhatsAppIcon variant="white" className="size-4" />
             Book a free trial
           </Button>
         </nav>
