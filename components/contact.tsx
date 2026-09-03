@@ -56,7 +56,7 @@ export function Contact() {
                 </span>
                 <span className="flex flex-col">
                   <span className="font-bold">WhatsApp us</span>
-                  <span className="text-sm text-muted-foreground">Fastest reply, usually within a few hours</span>
+                  <span className="text-sm text-muted-foreground">{site.whatsappDisplay}</span>
                 </span>
               </a>
             </li>

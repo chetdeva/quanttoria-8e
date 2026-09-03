@@ -1,6 +1,19 @@
 import Image from 'next/image'
-import { Quote } from 'lucide-react'
-import { site } from '@/lib/site'
+import { MessageCircle, Quote } from 'lucide-react'
+import { site, whatsappLink } from '@/lib/site'
+
+function LinkedInIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      className={className}
+      aria-hidden="true"
+    >
+      <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.23 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.46c.98 0 1.77-.77 1.77-1.73V1.73C24 .77 23.21 0 22.23 0z" />
+    </svg>
+  )
+}
 
 const credentials = [
   { label: 'Teaching hours', value: site.owner.hours },
@@ -44,6 +57,27 @@ export function MeetTutor() {
             {site.owner.name}
           </h2>
           <p className="text-lg font-semibold opacity-90">{site.owner.role}</p>
+
+          <div className="flex flex-col items-start gap-3">
+            <a
+              href={whatsappLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-accent-foreground transition-opacity hover:opacity-90"
+            >
+              <MessageCircle className="size-4" aria-hidden="true" />
+              Connect on WhatsApp
+            </a>
+            <a
+              href={site.owner.linkedinUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-fit items-center gap-2 rounded-full bg-primary-foreground/10 px-5 py-2.5 text-sm font-bold ring-1 ring-primary-foreground/25 transition-colors hover:bg-primary-foreground/20"
+            >
+              <LinkedInIcon className="size-4" />
+              Connect on LinkedIn
+            </a>
+          </div>
 
           <div className="relative rounded-3xl bg-primary-foreground/10 p-6 ring-1 ring-primary-foreground/15">
             <Quote className="absolute -top-4 left-6 size-8 text-accent" aria-hidden="true" />

@@ -9,13 +9,13 @@ export const site = {
     name: 'Princy Sugandh',
     role: 'Founder & Lead Math Educator',
     hours: '9000+',
+    linkedinUrl: 'https://www.linkedin.com/in/princysugandh/',
   },
-  // PLACEHOLDER: international format, digits only (e.g. 919876543210)
-  whatsappNumber: '000000000000',
-  // PLACEHOLDER
-  email: 'hello@quanttoria.com',
-  // PLACEHOLDER: replace with the live Trustpilot profile URL
-  trustpilotUrl: 'https://www.trustpilot.com/',
+  whatsappNumber: '919119571369',
+  whatsappDisplay: '+91 91195 71369',
+  email: 'princyaghaw@gmail.com',
+  trustpilotUrl:
+    'https://www.trustpilot.com/review/byjusfutureschool.com?search=princy&stars=5',
   whatsappMessage:
     "Hi Princy! I'd like to book a free trial math class for my child. My child is in grade ___.",
 }
