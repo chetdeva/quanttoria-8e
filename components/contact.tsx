@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
-import { Mail, MessageCircle } from 'lucide-react'
+import { Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { site, whatsappLink } from '@/lib/site'
+import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
 const grades = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8']
 
@@ -51,8 +52,8 @@ export function Contact() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-4 rounded-2xl bg-card p-4 shadow-sm ring-1 ring-border transition-colors hover:ring-primary"
               >
-                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-mint text-mint-foreground">
-                  <MessageCircle className="size-5" aria-hidden="true" />
+                <span className="inline-flex size-11 items-center justify-center rounded-xl bg-white ring-1 ring-border">
+                  <WhatsAppIcon className="size-6" />
                 </span>
                 <span className="flex flex-col">
                   <span className="font-bold">WhatsApp us</span>
@@ -140,7 +141,7 @@ export function Contact() {
                     className="sr-only"
                   />
                   {c === 'whatsapp' ? (
-                    <MessageCircle className="size-4" aria-hidden="true" />
+                    <WhatsAppIcon className="size-4" />
                   ) : (
                     <Mail className="size-4" aria-hidden="true" />
                   )}

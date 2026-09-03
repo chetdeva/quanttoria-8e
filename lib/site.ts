@@ -4,7 +4,7 @@
  */
 export const site = {
   name: 'Quanttoria',
-  tagline: 'Unlock the World of Math Excellence',
+  tagline: 'Empowering Global Minds with Mathematics',
   owner: {
     name: 'Princy Sugandh',
     role: 'Founder & Lead Math Educator',

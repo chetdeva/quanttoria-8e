@@ -1,7 +1,8 @@
 import Image from 'next/image'
-import { ArrowRight, MessageCircle, Star } from 'lucide-react'
+import { ArrowRight, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { site, whatsappLink } from '@/lib/site'
+import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
 export function Hero() {
   return (
@@ -37,7 +38,7 @@ export function Hero() {
               className="h-12 rounded-full px-6 text-base font-bold"
               nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
             >
-              <MessageCircle className="size-5" aria-hidden="true" />
+              <WhatsAppIcon variant="white" className="size-5" />
               Book your free trial
             </Button>
             <Button

@@ -1,6 +1,7 @@
 import Image from 'next/image'
-import { MessageCircle, Quote } from 'lucide-react'
+import { Quote } from 'lucide-react'
 import { site, whatsappLink } from '@/lib/site'
+import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
 function LinkedInIcon({ className }: { className?: string }) {
   return (
@@ -63,9 +64,9 @@ export function MeetTutor() {
               href={whatsappLink()}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex w-fit items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-bold text-accent-foreground transition-opacity hover:opacity-90"
+              className="inline-flex w-fit items-center gap-2 rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
             >
-              <MessageCircle className="size-4" aria-hidden="true" />
+              <WhatsAppIcon variant="white" className="size-5" />
               Connect on WhatsApp
             </a>
             <a
