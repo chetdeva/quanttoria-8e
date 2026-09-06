@@ -27,7 +27,8 @@ export function MeetTutor() {
   return (
     <section id="tutor" className="scroll-mt-20 bg-primary py-20 text-primary-foreground lg:py-28">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.3fr]">
-        <div className="relative mx-auto w-full max-w-sm">
+        <div className="relative mx-auto flex w-full max-w-sm flex-col gap-5">
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Teachers</p>
           <div className="overflow-hidden rounded-[2.5rem] border-4 border-primary-foreground/20 bg-accent shadow-2xl">
             <Image
               src="/images/princy-avatar.png"
@@ -53,7 +54,6 @@ export function MeetTutor() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Teachers</p>
           <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
             {site.owner.name}
           </h2>
@@ -61,11 +61,13 @@ export function MeetTutor() {
 
           <div className="flex flex-col items-start gap-3">
             <a
-              href="#contact"
+              href={whatsappLink()}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex w-fit items-center gap-2 rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
             >
               <WhatsAppIcon variant="white" className="size-5" />
-              Customize your plan
+              Connect on WhatsApp
             </a>
             <a
               href={site.owner.linkedinUrl}

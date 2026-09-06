@@ -91,23 +91,25 @@ export function Testimonials() {
           ))}
         </div>
 
-        <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {reviews.map((r) => (
-            <li
-              key={r.name + r.text.slice(0, 24)}
-              className="flex flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border"
-            >
-              <Stars count={r.rating} />
-              <blockquote className="flex-1 text-pretty text-base leading-relaxed text-foreground">
-                &ldquo;{r.text}&rdquo;
-              </blockquote>
-              <figcaption className="flex flex-col">
-                <span className="font-bold">{r.name}</span>
-                <span className="text-sm text-muted-foreground">{r.location}</span>
-              </figcaption>
-            </li>
-          ))}
-        </ul>
+        <div className="group relative overflow-hidden" aria-label="Parent testimonials carousel">
+          <div className="flex w-max animate-testimonials gap-5 py-2 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+            {[...reviews, ...reviews].map((r, index) => (
+              <article
+                key={`${r.name}-${index}`}
+                className="flex w-[min(82vw,22rem)] shrink-0 flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border sm:w-[22rem]"
+              >
+                <Stars count={r.rating} />
+                <blockquote className="flex-1 text-pretty text-base leading-relaxed text-foreground">
+                  &ldquo;{r.text}&rdquo;
+                </blockquote>
+                <footer className="flex flex-col">
+                  <span className="font-bold">{r.name}</span>
+                  <span className="text-sm text-muted-foreground">{r.location}</span>
+                </footer>
+              </article>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   )
