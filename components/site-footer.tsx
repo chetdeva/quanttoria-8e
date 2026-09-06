@@ -8,7 +8,7 @@ export function SiteFooter() {
         <div className="flex max-w-sm flex-col gap-3">
           <Logo variant="full" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            Live online math classes for grades 1 to 8, taught by {site.owner.name}.
+            Personalized online maths learning for US students in Grades 1 to 10, taught with patience by {site.owner.name}.
           </p>
         </div>
 

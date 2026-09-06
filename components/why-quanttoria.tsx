@@ -5,26 +5,26 @@ const reasons = [
   {
     icon: Eye,
     color: 'bg-primary text-primary-foreground',
-    title: 'Visual first',
-    body: 'Fractions become pizzas, algebra becomes balance scales. Kids see the concept before they memorise the rule, and the fear of numbers disappears.',
+    title: 'Understanding first',
+    body: 'We explain the why behind each method, so children build genuine understanding instead of relying on memorised steps.',
   },
   {
     icon: Globe2,
     color: 'bg-mint text-mint-foreground',
-    title: 'Global curriculum',
-    body: 'Built to international standards so your child can compete anywhere in the world, not just keep up with the class next door.',
+    title: 'US curriculum support',
+    body: 'Personalized support for Common Core, AP pathways and state standards from Grade 1 to 10.',
   },
   {
     icon: Trophy,
     color: 'bg-accent text-accent-foreground',
-    title: 'Exam ready',
-    body: 'Advanced concepts introduced early, applied in novel scenarios, so Math Olympiad, SAT and NAPLAN questions feel familiar, not frightening.',
+    title: 'Ready for what&apos;s next',
+    body: 'Strong foundations and thoughtful challenge help students feel ready for classroom milestones, AP goals and their next big step.',
   },
   {
     icon: Sparkles,
     color: 'bg-coral text-coral-foreground',
-    title: 'Personalised and engaging',
-    body: 'Every lesson is planned for one child. Rigorous, insightful and genuinely fun, whatever level they start at.',
+    title: 'Private and personalised',
+    body: 'Every lesson is shaped around one child: their pace, learning gaps, strengths, goals and confidence.',
   },
 ]
 
@@ -52,11 +52,10 @@ export function WhyQuanttoria() {
                 Why Quanttoria
               </p>
               <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-                Kids don&apos;t hate math. They hate not <em className="not-italic text-primary">seeing</em> it.
+                Your child is not bad at maths. They may simply need the right approach.
               </h2>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-                Every concept is built systematically to create mathematical thinkers who solve
-                real-world problems with confidence and go on to surpass their grade level.
+                We meet children where they are, close foundational gaps and build the confidence to reason, apply strategies and keep going when a problem is hard.
               </p>
             </div>
 

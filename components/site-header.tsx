@@ -4,9 +4,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { navLinks, site, whatsappLink } from '@/lib/site'
+import { navLinks, site } from '@/lib/site'
 import { Logo } from '@/components/logo'
-import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
 export function SiteHeader() {
   const [open, setOpen] = useState(false)
@@ -33,10 +32,9 @@ export function SiteHeader() {
         <div className="hidden md:block">
           <Button
             className="rounded-full font-bold"
-            nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
+            nativeButton={false} render={<a href="#contact" />}
           >
-            <WhatsAppIcon variant="white" className="size-4" />
-            Book a free trial
+            Customize your plan
           </Button>
         </div>
 
@@ -70,10 +68,9 @@ export function SiteHeader() {
           ))}
           <Button
             className="mt-2 rounded-full font-bold"
-            nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
+            nativeButton={false} render={<a href="#contact" />}
           >
-            <WhatsAppIcon variant="white" className="size-4" />
-            Book a free trial
+            Customize your plan
           </Button>
         </nav>
       )}

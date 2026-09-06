@@ -1,8 +1,7 @@
 import Image from 'next/image'
 import { ArrowRight, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { site, whatsappLink } from '@/lib/site'
-import { WhatsAppIcon } from '@/components/whatsapp-icon'
+import { site } from '@/lib/site'
 
 export function Hero() {
   return (
@@ -11,11 +10,11 @@ export function Hero() {
         <div className="flex flex-col items-start gap-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-bold text-accent-foreground">
             <Star className="size-4 fill-current" aria-hidden="true" />
-            Live 1:1 online classes for Grades 1 to 8
+            Personalized 1:1 learning for US students, Grades 1 to 10
           </span>
 
           <h1 className="font-display text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            Turn <span className="text-primary">number-fear</span> into math{' '}
+            Turn <span className="text-primary">maths fear</span> into{' '}
             <span className="relative isolate inline-block">
               confidence
               <span
@@ -27,19 +26,16 @@ export function Hero() {
           </h1>
 
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            {site.name} teaches math visually, so kids actually see how it works. With a global
-            curriculum blending Vedic, abstract and NAPLAN methods, your child masters the
-            fundamentals and gets ready for Math Olympiads, SATs and beyond.
+            No two learners are alike. {site.name} pairs your child with the right teacher, pace and practice plan to make maths feel clear, doable and even fun—whether they are catching up or reaching for the next challenge.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
             <Button
               size="lg"
               className="h-12 rounded-full px-6 text-base font-bold"
-              nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
+              nativeButton={false} render={<a href="#contact" />}
             >
-              <WhatsAppIcon variant="white" className="size-5" />
-              Book your free trial
+              Customize your plan
             </Button>
             <Button
               size="lg"
@@ -92,7 +88,7 @@ export function Hero() {
             3/4 + 1/4 = 1
           </div>
           <div className="absolute -right-3 bottom-10 hidden rotate-[5deg] rounded-2xl bg-mint px-4 py-2 font-display text-lg font-bold text-mint-foreground shadow-lg sm:block">
-            Olympiad ready
+            Confidence, unlocked
           </div>
         </div>
       </div>

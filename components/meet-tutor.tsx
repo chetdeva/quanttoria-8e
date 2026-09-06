@@ -19,8 +19,8 @@ function LinkedInIcon({ className }: { className?: string }) {
 const credentials = [
   { label: 'Teaching hours', value: site.owner.hours },
   { label: 'Industry', value: 'Ed-Tech' },
-  { label: 'Grades', value: '1 to 8' },
-  { label: 'Focus', value: 'Olympiad, SAT, NAPLAN' },
+  { label: 'Grades', value: '1 to 10' },
+  { label: 'US pathways', value: 'Common Core + AP' },
 ]
 
 export function MeetTutor() {
@@ -53,21 +53,19 @@ export function MeetTutor() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet your tutor</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Teachers</p>
           <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
             {site.owner.name}
           </h2>
-          <p className="text-lg font-semibold opacity-90">{site.owner.role}</p>
+          <p className="text-lg font-semibold opacity-90">{site.owner.role} &amp; Personalised Maths Coach</p>
 
           <div className="flex flex-col items-start gap-3">
             <a
-              href={whatsappLink()}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#contact"
               className="inline-flex w-fit items-center gap-2 rounded-full bg-[#25d366] px-5 py-2.5 text-sm font-bold text-white transition-opacity hover:opacity-90"
             >
               <WhatsAppIcon variant="white" className="size-5" />
-              Connect on WhatsApp
+              Customize your plan
             </a>
             <a
               href={site.owner.linkedinUrl}
@@ -92,14 +90,10 @@ export function MeetTutor() {
 
           <div className="flex flex-col gap-4 text-base leading-relaxed opacity-90">
             <p>
-              With over {site.owner.hours} hours of teaching in the Ed-Tech industry, Princy
-              bases her curriculum on a blend of Vedic, abstract, NAPLAN and global mathematics,
-              helping learners grasp the practical applications of math in real life.
+              With over {site.owner.hours} hours of teaching in Ed-Tech, Princy leads a growing, caring teaching practice for US families. Every learning plan starts with the child—not a package—and changes as they grow.
             </p>
             <p>
-              She is dedicated to creating an inclusive, supportive learning environment and
-              advocates for improved access to quality math education for every student, whatever
-              their starting point.
+              Together, our teachers create an inclusive, supportive learning environment where questions are welcome, progress is visible and every student gets the right kind of challenge.
             </p>
           </div>
         </div>

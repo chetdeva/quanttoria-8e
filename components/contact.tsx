@@ -1,15 +1,28 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { site, whatsappLink } from '@/lib/site'
 import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
-const grades = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8']
+const grades = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10']
 
 export function Contact() {
   const [channel, setChannel] = useState<'whatsapp' | 'email'>('whatsapp')
+  const formRef = useRef<HTMLFormElement>(null)
+
+  useEffect(() => {
+    function focusForm() {
+      if (window.location.hash === '#contact') {
+        formRef.current?.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true })
+      }
+    }
+
+    focusForm()
+    window.addEventListener('hashchange', focusForm)
+    return () => window.removeEventListener('hashchange', focusForm)
+  }, [])
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -19,12 +32,12 @@ export function Contact() {
     const grade = String(data.get('grade') ?? '')
     const goal = String(data.get('goal') ?? '')
 
-    const message = `Hi Princy! I'd like to book a free trial class.\n\nParent: ${parent}\nChild: ${child}\nGrade: ${grade}\nGoal: ${goal}`
+    const message = `Hi Princy! I'd like to customize a learning plan for my child.\n\nParent: ${parent}\nChild: ${child}\nGrade: ${grade}\nLearning goals or challenges: ${goal}`
 
     if (channel === 'whatsapp') {
       window.open(whatsappLink(message), '_blank', 'noopener,noreferrer')
     } else {
-      const subject = encodeURIComponent(`Free trial enquiry - ${child} (${grade})`)
+      const subject = encodeURIComponent(`Personalized learning plan enquiry - ${child} (${grade})`)
       window.location.href = `mailto:${site.email}?subject=${subject}&body=${encodeURIComponent(message)}`
     }
   }
@@ -34,14 +47,14 @@ export function Contact() {
       <div className="mx-auto grid w-full max-w-6xl gap-12 px-4 sm:px-6 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
           <p className="text-sm font-bold uppercase tracking-widest text-primary">
-            Book a free trial
+            Customize your plan
           </p>
           <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-            Ready to unlock your child&apos;s full potential in math?
+            Let&apos;s build a plan that fits your child.
           </h2>
           <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-            Tell us a little about your child and we&apos;ll get back to you with trial slots.
-            No commitment, no payment details, just one great class.
+            Tell us about your child&apos;s current challenges, grade and learning goals. We&apos;ll help
+            you find the most suitable next step with a patient, personalised coach.
           </p>
 
           <ul className="flex flex-col gap-3">
@@ -79,11 +92,12 @@ export function Contact() {
         </div>
 
         <form
+          ref={formRef}
           onSubmit={onSubmit}
           className="flex flex-col gap-5 rounded-[2rem] bg-card p-6 shadow-xl shadow-primary/10 ring-1 ring-border sm:p-8"
         >
           <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Parent's name" name="parent" placeholder="Your name" required />
+            <Field label="Parent/Guardian name" name="parent" placeholder="Your name" required />
             <Field label="Child's name" name="child" placeholder="Their name" required />
           </div>
 
@@ -111,13 +125,13 @@ export function Contact() {
 
           <div className="flex flex-col gap-2">
             <label htmlFor="goal" className="text-sm font-bold">
-              What would you like help with?
+              What challenges or goals should we know about?
             </label>
             <textarea
               id="goal"
               name="goal"
               rows={3}
-              placeholder="e.g. Fractions are a struggle, or preparing for a Math Olympiad"
+              placeholder="e.g. Fractions are difficult, analysing word problems, or preparing for a global assessment"
               className="rounded-xl border-2 border-input bg-background px-3 py-2 text-base leading-relaxed outline-none focus-visible:border-primary"
             />
           </div>
@@ -152,10 +166,10 @@ export function Contact() {
           </fieldset>
 
           <Button type="submit" size="lg" className="h-12 rounded-full text-base font-bold">
-            Request my free trial
+            Customize my child&apos;s plan
           </Button>
           <p className="text-center text-xs leading-relaxed text-muted-foreground">
-            We only use your details to arrange the trial class.
+            We only use your details to understand your child&apos;s needs and recommend the right next step.
           </p>
         </form>
       </div>
