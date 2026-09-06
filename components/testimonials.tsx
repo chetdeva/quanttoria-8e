@@ -1,3 +1,6 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
 import { ExternalLink, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { site } from '@/lib/site'
@@ -56,6 +59,34 @@ function Stars({ count }: { count: number }) {
 }
 
 export function Testimonials() {
+  const carouselRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+
+  useEffect(() => {
+    const carousel = carouselRef.current
+    if (!carousel) return
+
+    const updateActiveIndex = () => {
+      const cards = Array.from(carousel.children)
+      const closestIndex = cards.reduce((closest, card, index) => {
+        const currentDistance = Math.abs((card as HTMLElement).offsetLeft - carousel.scrollLeft)
+        const closestDistance = Math.abs((cards[closest] as HTMLElement).offsetLeft - carousel.scrollLeft)
+        return currentDistance < closestDistance ? index : closest
+      }, 0)
+      setActiveIndex(Math.min(closestIndex, reviews.length - 1))
+    }
+
+    carousel.addEventListener('scroll', updateActiveIndex, { passive: true })
+    return () => carousel.removeEventListener('scroll', updateActiveIndex)
+  }, [])
+
+  function scrollToReview(index: number) {
+    const carousel = carouselRef.current
+    const card = carousel?.children[index] as HTMLElement | undefined
+    card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    setActiveIndex(index)
+  }
+
   return (
     <section id="reviews" className="scroll-mt-20 py-20 lg:py-28">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-12 px-4 sm:px-6">
@@ -91,22 +122,45 @@ export function Testimonials() {
           ))}
         </div>
 
-        <div className="group relative overflow-hidden" aria-label="Parent testimonials carousel">
-          <div className="flex w-max animate-testimonials gap-5 py-2 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
-            {[...reviews, ...reviews].map((r, index) => (
-              <article
-                key={`${r.name}-${index}`}
-                className="flex w-[min(82vw,22rem)] shrink-0 flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border sm:w-[22rem]"
+        <div>
+          <div
+            ref={carouselRef}
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            aria-label="Parent testimonials carousel"
+          >
+            {reviews.map((r, index) => (
+              <a
+                key={r.name + r.text.slice(0, 24)}
+                href={site.trustpilotUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Read ${r.name}'s review on Trustpilot`}
+                className="flex w-[min(82vw,22rem)] shrink-0 snap-start flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border transition-transform hover:-translate-y-1 hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:w-[22rem]"
               >
                 <Stars count={r.rating} />
                 <blockquote className="flex-1 text-pretty text-base leading-relaxed text-foreground">
                   &ldquo;{r.text}&rdquo;
                 </blockquote>
-                <footer className="flex flex-col">
-                  <span className="font-bold">{r.name}</span>
-                  <span className="text-sm text-muted-foreground">{r.location}</span>
+                <footer className="flex items-center justify-between gap-3">
+                  <span className="flex flex-col">
+                    <span className="font-bold">{r.name}</span>
+                    <span className="text-sm text-muted-foreground">{r.location}</span>
+                  </span>
+                  <ExternalLink className="size-4 shrink-0 text-primary" aria-hidden="true" />
                 </footer>
-              </article>
+              </a>
+            ))}
+          </div>
+          <div className="mt-5 flex items-center justify-center gap-2" aria-label="Choose a testimonial">
+            {reviews.map((review, index) => (
+              <button
+                key={`${review.name}-dot`}
+                type="button"
+                onClick={() => scrollToReview(index)}
+                aria-label={`Show testimonial ${index + 1}`}
+                aria-current={activeIndex === index ? 'true' : undefined}
+                className={`rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${activeIndex === index ? 'h-2.5 w-7 bg-primary' : 'size-2.5 bg-border hover:bg-primary/50'}`}
+              />
             ))}
           </div>
         </div>
