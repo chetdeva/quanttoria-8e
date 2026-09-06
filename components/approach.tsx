@@ -27,7 +27,24 @@ const journey = [
   },
 ]
 
-const usBoards = ['Common Core', 'AP Calculus', 'AP Statistics', 'State standards']
+const usBoards = [
+  {
+    name: 'Common Core',
+    detail: 'Build strong foundations, reasoning and problem-solving habits.',
+  },
+  {
+    name: 'AP Calculus',
+    detail: 'Prepare for limits, derivatives, integrals and exam-style thinking.',
+  },
+  {
+    name: 'AP Statistics',
+    detail: 'Make data, probability and interpretation feel less intimidating.',
+  },
+  {
+    name: 'State standards',
+    detail: 'Stay aligned with your child’s local classroom expectations.',
+  },
+]
 
 const outcomes = [
   'Clear understanding of concepts and the reasons behind each method',
@@ -51,13 +68,18 @@ export function Approach() {
           <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
             Personalized learning is more than a worksheet with a name on it. We combine a thoughtful teacher, the right challenge and regular parent feedback to make every lesson count.
           </p>
+          <div className="flex flex-wrap justify-center gap-2 pt-2 text-xs font-bold uppercase tracking-wide text-primary">
+            <span className="rounded-full bg-accent px-3 py-1.5">At their pace</span>
+            <span className="rounded-full bg-secondary px-3 py-1.5">For their goals</span>
+            <span className="rounded-full bg-mint/30 px-3 py-1.5">With real feedback</span>
+          </div>
         </div>
 
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <div aria-hidden="true" className="absolute left-[12%] right-[12%] top-8 hidden border-t-2 border-dashed border-primary/25 lg:block" />
           {journey.map((item) => (
-            <div key={item.step} className="relative flex flex-col gap-3">
-              <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg ${item.tint}`}>
+            <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+              <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg transition-transform group-hover:rotate-3 ${item.tint}`}>
                 {item.step}
               </div>
               <h3 className="font-display text-2xl font-extrabold leading-tight">{item.name}</h3>
@@ -66,17 +88,27 @@ export function Approach() {
           ))}
         </div>
 
-        <div className="grid gap-6 rounded-[2rem] bg-primary p-8 text-primary-foreground shadow-xl shadow-primary/15 lg:grid-cols-[1.1fr_1fr] lg:p-10">
-          <div className="flex flex-col gap-4">
-            <p className="text-sm font-bold uppercase tracking-widest text-accent">US learning support</p>
-            <h3 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Ready for the classroom, confident beyond it.</h3>
-            <p className="text-base leading-relaxed opacity-90">We currently support families across the United States with learning plans aligned to the standards and pathways that matter to them.</p>
+        <div className="overflow-hidden rounded-[2rem] bg-primary text-primary-foreground shadow-xl shadow-primary/15">
+          <div className="grid gap-8 p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
+            <div className="flex flex-col gap-4">
+              <p className="text-sm font-bold uppercase tracking-widest text-accent">US learning support</p>
+              <h3 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">A plan that speaks your child&apos;s school language.</h3>
+              <p className="text-base leading-relaxed opacity-90">From everyday classroom confidence to ambitious AP goals, we connect the dots between where your child is today and where they want to go next.</p>
+              <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
+                <div className="rounded-2xl bg-primary-foreground/10 p-4 ring-1 ring-primary-foreground/15"><p className="font-display text-2xl font-extrabold">1:1</p><p className="opacity-75">focused attention</p></div>
+                <div className="rounded-2xl bg-primary-foreground/10 p-4 ring-1 ring-primary-foreground/15"><p className="font-display text-2xl font-extrabold">US</p><p className="opacity-75">standards-aware</p></div>
+              </div>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {usBoards.map((board) => (
+                <div key={board.name} className="flex flex-col gap-2 rounded-2xl bg-primary-foreground/10 p-5 ring-1 ring-primary-foreground/15 transition-colors hover:bg-primary-foreground/15">
+                  <span className="w-fit rounded-full bg-accent px-3 py-1 text-xs font-extrabold text-accent-foreground">{board.name}</span>
+                  <p className="text-sm leading-relaxed opacity-85">{board.detail}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-wrap content-start gap-3 lg:justify-end">
-            {usBoards.map((board) => (
-              <span key={board} className="rounded-full bg-primary-foreground/10 px-4 py-2 text-sm font-bold ring-1 ring-primary-foreground/20">{board}</span>
-            ))}
-          </div>
+          <div className="border-t border-primary-foreground/15 px-8 py-4 text-sm font-semibold opacity-80 lg:px-10">Not sure which pathway fits? We&apos;ll help you choose a starting point.</div>
         </div>
 
         <div className="flex flex-col gap-5 rounded-[2rem] border-2 border-dashed border-primary/30 bg-accent/30 p-8 sm:flex-row sm:items-center sm:justify-between lg:p-10">
