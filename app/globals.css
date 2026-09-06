@@ -105,3 +105,16 @@
   background-image: radial-gradient(oklch(0.52 0.21 262 / 0.14) 1.5px, transparent 1.5px);
   background-size: 22px 22px;
 }
+
+@keyframes testimonials-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(calc(-50% - 0.625rem));
+  }
+}
+
+@utility animate-testimonials {
+  animation: testimonials-scroll 42s linear infinite;
+}
