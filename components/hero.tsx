@@ -11,11 +11,11 @@ export function Hero() {
         <div className="flex flex-col items-start gap-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-bold text-accent-foreground">
             <Star className="size-4 fill-current" aria-hidden="true" />
-            Live 1:1 online classes for Grades 1 to 8
+            Personalised 1:1 maths coaching for Grades 1 to 10
           </span>
 
           <h1 className="font-display text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            Turn <span className="text-primary">number-fear</span> into math{' '}
+            Turn <span className="text-primary">maths fear</span> into{' '}
             <span className="relative isolate inline-block">
               confidence
               <span
@@ -27,9 +27,9 @@ export function Hero() {
           </h1>
 
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            {site.name} teaches math visually, so kids actually see how it works. With a global
-            curriculum blending Vedic, abstract and NAPLAN methods, your child masters the
-            fundamentals and gets ready for Math Olympiads, SATs and beyond.
+            Does your child avoid maths, feel anxious before tests, or struggle to analyse questions
+            and choose the right strategy? {site.name} provides patient, private coaching that
+            builds understanding, problem-solving skills and confidence across global maths curricula.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -39,7 +39,7 @@ export function Hero() {
               nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
             >
               <WhatsAppIcon variant="white" className="size-5" />
-              Book your free trial
+              Book a consultation
             </Button>
             <Button
               size="lg"

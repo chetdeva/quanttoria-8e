@@ -36,7 +36,7 @@ export function SiteHeader() {
             nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
           >
             <WhatsAppIcon variant="white" className="size-4" />
-            Book a free trial
+            Book a consultation
           </Button>
         </div>
 
@@ -73,7 +73,7 @@ export function SiteHeader() {
             nativeButton={false} render={<a href={whatsappLink()} target="_blank" rel="noopener noreferrer" />}
           >
             <WhatsAppIcon variant="white" className="size-4" />
-            Book a free trial
+            Book a consultation
           </Button>
         </nav>
       )}

@@ -17,7 +17,7 @@ export const site = {
   trustpilotUrl:
     'https://www.trustpilot.com/review/byjusfutureschool.com?search=princy&stars=5',
   whatsappMessage:
-    "Hi Princy! I'd like to book a free trial math class for my child. My child is in grade ___.",
+    "Hi Princy! I'd like to book a personalised maths consultation for my child. My child is in Grade ___.",
 }
 
 export function whatsappLink(message: string = site.whatsappMessage) {
@@ -27,7 +27,7 @@ export function whatsappLink(message: string = site.whatsappMessage) {
 export const navLinks = [
   { href: '#why', label: 'Why Quanttoria' },
   { href: '#approach', label: 'Our Approach' },
-  { href: '#tutor', label: 'Meet Princy' },
+  { href: '#tutor', label: 'Meet our Teacher' },
   { href: '#reviews', label: 'Reviews' },
   { href: '#contact', label: 'Contact' },
 ]

@@ -19,7 +19,7 @@ function LinkedInIcon({ className }: { className?: string }) {
 const credentials = [
   { label: 'Teaching hours', value: site.owner.hours },
   { label: 'Industry', value: 'Ed-Tech' },
-  { label: 'Grades', value: '1 to 8' },
+  { label: 'Grades', value: '1 to 10' },
   { label: 'Focus', value: 'Olympiad, SAT, NAPLAN' },
 ]
 
@@ -53,11 +53,11 @@ export function MeetTutor() {
         </div>
 
         <div className="flex flex-col gap-6">
-          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet your tutor</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Teacher</p>
           <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
             {site.owner.name}
           </h2>
-          <p className="text-lg font-semibold opacity-90">{site.owner.role}</p>
+          <p className="text-lg font-semibold opacity-90">{site.owner.role} &amp; Personalised Maths Coach</p>
 
           <div className="flex flex-col items-start gap-3">
             <a
@@ -93,8 +93,8 @@ export function MeetTutor() {
           <div className="flex flex-col gap-4 text-base leading-relaxed opacity-90">
             <p>
               With over {site.owner.hours} hours of teaching in the Ed-Tech industry, Princy
-              bases her curriculum on a blend of Vedic, abstract, NAPLAN and global mathematics,
-              helping learners grasp the practical applications of math in real life.
+              creates a supportive, one-on-one learning path for Grades 1 to 10. Her coaching
+              blends conceptual understanding, analysis and practical strategies across global maths curricula.
             </p>
             <p>
               She is dedicated to creating an inclusive, supportive learning environment and

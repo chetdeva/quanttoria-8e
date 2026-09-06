@@ -2,36 +2,36 @@ import { CheckCircle2 } from 'lucide-react'
 
 const methods = [
   {
-    name: 'Vedic',
+    name: 'Understanding',
     tint: 'bg-accent text-accent-foreground',
-    desc: 'Lightning-fast mental math techniques that make calculation feel like a game.',
+    desc: 'We make the why visible before asking children to remember the how.',
   },
   {
-    name: 'Abstract',
+    name: 'Analysis',
     tint: 'bg-primary text-primary-foreground',
-    desc: 'Patterns, logic and reasoning that transfer to any new problem your child meets.',
+    desc: 'Children learn to break down questions, notice patterns and explain their reasoning.',
   },
   {
-    name: 'NAPLAN',
+    name: 'Strategy',
     tint: 'bg-mint text-mint-foreground',
-    desc: 'Aligned to the Australian national benchmark for numeracy, year by year.',
+    desc: 'Practical strategies help children choose an approach and apply it to unfamiliar problems.',
   },
   {
-    name: 'Global',
+    name: 'Global goals',
     tint: 'bg-coral text-coral-foreground',
-    desc: 'Common Core, Singapore and Olympiad-style problem solving, blended into one path.',
+    desc: 'A flexible path for global curricula, assessments and children who want to excel.',
   },
 ]
 
 const outcomes = [
-  'Deep understanding of core concepts and algorithms',
-  'Confidence solving complex, multi-step equations',
-  'Practical application of math in real-life situations',
-  'Preparation for Math Olympiads, SATs and NAPLAN',
-  'Logical thinking that serves them long after the exam',
+  'Clear understanding of concepts and the reasons behind each method',
+  'Confidence analysing word problems and unfamiliar questions',
+  'Practical strategies for applying maths beyond worked examples',
+  'Preparation for global curricula, assessments and competitions',
+  'Resilience, independence and logical thinking that lasts',
 ]
 
-const grades = ['Grade 1-2', 'Grade 3-5', 'Grade 6-8', 'Olympiad', 'SAT prep']
+const grades = ['Grade 1-2', 'Grade 3-5', 'Grade 6-8', 'Grade 9-10', 'Global curriculum']
 
 export function Approach() {
   return (
@@ -40,12 +40,12 @@ export function Approach() {
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
           <p className="text-sm font-bold uppercase tracking-widest text-primary">Our approach</p>
           <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-            Four traditions of math. One clear path.
+            From confusion to confident mathematical thinking.
           </h2>
           <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-            We stand in the future and work backwards. Our curriculum blends the best of Vedic,
-            abstract, NAPLAN and global mathematics so kids learn how math actually works, not
-            just how to pass the next test.
+            Every lesson is shaped around your child&apos;s current understanding, learning gaps,
+            pace, strengths and goals. We teach understanding rather than memorisation, so children
+            can analyse unfamiliar questions, select strategies and explain their reasoning.
           </p>
         </div>
 

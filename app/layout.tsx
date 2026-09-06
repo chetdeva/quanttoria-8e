@@ -16,23 +16,23 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'Quanttoria | Online Math Tutoring for Grades 1-8',
+  title: 'Quanttoria | Personalised Maths Coaching for Grades 1-10',
   description:
-    'Live, one-to-one online math classes for kids in grades 1-8. Visual, Vedic and global math methods with 9000+ hours of teaching experience. Olympiad, SAT and NAPLAN preparation. Book a free trial.',
+    'Private, one-to-one online maths coaching for Grades 1-10. Help your child build understanding, analysis, problem-solving strategies and confidence across global maths curricula.',
   generator: 'v0.app',
   keywords: [
-    'online math tutor',
-    'math classes for kids',
-    'Math Olympiad preparation',
-    'NAPLAN math',
-    'Vedic math',
+    'maths coaching for children',
+    'one-to-one maths classes',
+    'global maths curriculum',
+    'Maths Olympiad preparation',
+    'problem-solving strategies',
     'Quanttoria',
     'Princy Sugandh',
   ],
   openGraph: {
     title: 'Quanttoria | Empowering Global Minds with Mathematics',
     description:
-      'Live online math classes that turn number-fear into confidence. 9000+ hours of teaching experience. Book a free trial.',
+      'Patient, personalised maths coaching that helps children move from confusion to understanding and confidence.',
     type: 'website',
   },
   icons: {
