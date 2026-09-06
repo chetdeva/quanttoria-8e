@@ -16,21 +16,21 @@ const nunito = Nunito({
 })
 
 export const metadata: Metadata = {
-  title: 'Quanttoria | Personalised Maths Coaching for Grades 1-10',
+  title: 'Quanttoria | Personalized Learning for US Students',
   description:
     'Private, one-to-one online maths coaching for Grades 1-10. Help your child build understanding, analysis, problem-solving strategies and confidence across global maths curricula.',
   generator: 'v0.app',
   keywords: [
     'maths coaching for children',
     'one-to-one maths classes',
-    'global maths curriculum',
-    'Maths Olympiad preparation',
+    'US Common Core maths',
+    'AP maths support',
     'problem-solving strategies',
     'Quanttoria',
     'Princy Sugandh',
   ],
   openGraph: {
-    title: 'Quanttoria | Empowering Global Minds with Mathematics',
+    title: 'Quanttoria | Personalized Learning for US Students',
     description:
       'Patient, personalised maths coaching that helps children move from confusion to understanding and confidence.',
     type: 'website',

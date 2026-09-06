@@ -11,14 +11,14 @@ const reasons = [
   {
     icon: Globe2,
     color: 'bg-mint text-mint-foreground',
-    title: 'Global curriculum',
-    body: 'Support for global maths curricula from Grade 1 to 10, with conceptual understanding, reasoning and application at the centre.',
+    title: 'US curriculum support',
+    body: 'Personalized support for Common Core, AP pathways and state standards from Grade 1 to 10.',
   },
   {
     icon: Trophy,
     color: 'bg-accent text-accent-foreground',
-    title: 'Exam ready',
-    body: 'Advanced concepts introduced early, applied in novel scenarios, so Math Olympiad, SAT and NAPLAN questions feel familiar, not frightening.',
+    title: 'Ready for what&apos;s next',
+    body: 'Strong foundations and thoughtful challenge help students feel ready for classroom milestones, AP goals and their next big step.',
   },
   {
     icon: Sparkles,

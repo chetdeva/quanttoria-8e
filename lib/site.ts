@@ -4,7 +4,7 @@
  */
 export const site = {
   name: 'Quanttoria',
-  tagline: 'Empowering Global Minds with Mathematics',
+  tagline: 'Personalized learning that makes maths click',
   owner: {
     name: 'Princy Sugandh',
     role: 'Founder & Lead Math Educator',
@@ -17,7 +17,7 @@ export const site = {
   trustpilotUrl:
     'https://www.trustpilot.com/review/byjusfutureschool.com?search=princy&stars=5',
   whatsappMessage:
-    "Hi Princy! I'd like to book a personalised maths consultation for my child. My child is in Grade ___.",
+    "Hi Princy! I'd like to customize a personalized learning plan for my child. My child is in Grade ___.",
 }
 
 export function whatsappLink(message: string = site.whatsappMessage) {
@@ -26,8 +26,8 @@ export function whatsappLink(message: string = site.whatsappMessage) {
 
 export const navLinks = [
   { href: '#why', label: 'Why Quanttoria' },
-  { href: '#approach', label: 'Our Approach' },
-  { href: '#tutor', label: 'Meet our Teacher' },
-  { href: '#reviews', label: 'Reviews' },
+  { href: '#approach', label: 'How it works' },
+  { href: '#tutor', label: 'Meet our Teachers' },
+  { href: '#reviews', label: 'Why parents trust us' },
   { href: '#contact', label: 'Contact' },
 ]

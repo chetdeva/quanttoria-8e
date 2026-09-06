@@ -1,27 +1,33 @@
 import { CheckCircle2 } from 'lucide-react'
 
-const methods = [
+const journey = [
   {
-    name: 'Understanding',
+    step: '01',
+    name: 'Tell us about your child',
+    desc: 'Share their strengths, struggles, interests and goals. We listen before we teach.',
     tint: 'bg-accent text-accent-foreground',
-    desc: 'We make the why visible before asking children to remember the how.',
   },
   {
-    name: 'Analysis',
+    step: '02',
+    name: 'Build your learning plan',
+    desc: 'We match the right teacher, pace, lesson style and practice for your learner.',
     tint: 'bg-primary text-primary-foreground',
-    desc: 'Children learn to break down questions, notice patterns and explain their reasoning.',
   },
   {
-    name: 'Strategy',
+    step: '03',
+    name: 'Your first demo lecture is completely free',
+    desc: 'Meet your teacher in a live, personalized session. No obligation. No credit card.',
     tint: 'bg-mint text-mint-foreground',
-    desc: 'Practical strategies help children choose an approach and apply it to unfamiliar problems.',
   },
   {
-    name: 'Global goals',
+    step: '04',
+    name: 'Learn, track, and grow',
+    desc: 'Parents get clear feedback while children build skills, confidence and independence.',
     tint: 'bg-coral text-coral-foreground',
-    desc: 'A flexible path for global curricula, assessments and children who want to excel.',
   },
 ]
+
+const usBoards = ['Common Core', 'AP Calculus', 'AP Statistics', 'State standards']
 
 const outcomes = [
   'Clear understanding of concepts and the reasons behind each method',
@@ -31,34 +37,55 @@ const outcomes = [
   'Resilience, independence and logical thinking that lasts',
 ]
 
-const grades = ['Grade 1-2', 'Grade 3-5', 'Grade 6-8', 'Grade 9-10', 'Global curriculum']
+const grades = ['Grade 1-2', 'Grade 3-5', 'Grade 6-8', 'Grade 9-10', 'US standards']
 
 export function Approach() {
   return (
     <section id="approach" className="scroll-mt-20 py-20 lg:py-28">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-          <p className="text-sm font-bold uppercase tracking-widest text-primary">Our approach</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-primary">How Quanttoria works</p>
           <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-            From confusion to confident mathematical thinking.
+            A learning plan that grows with your child.
           </h2>
           <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-            Every lesson is shaped around your child&apos;s current understanding, learning gaps,
-            pace, strengths and goals. We teach understanding rather than memorisation, so children
-            can analyse unfamiliar questions, select strategies and explain their reasoning.
+            Personalized learning is more than a worksheet with a name on it. We combine a thoughtful teacher, the right challenge and regular parent feedback to make every lesson count.
           </p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {methods.map((m) => (
-            <div
-              key={m.name}
-              className={`flex flex-col gap-3 rounded-3xl p-6 ${m.tint} transition-transform hover:-translate-y-1`}
-            >
-              <h3 className="font-display text-3xl font-extrabold">{m.name}</h3>
-              <p className="text-sm leading-relaxed opacity-90">{m.desc}</p>
+        <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div aria-hidden="true" className="absolute left-[12%] right-[12%] top-8 hidden border-t-2 border-dashed border-primary/25 lg:block" />
+          {journey.map((item) => (
+            <div key={item.step} className="relative flex flex-col gap-3">
+              <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg ${item.tint}`}>
+                {item.step}
+              </div>
+              <h3 className="font-display text-2xl font-extrabold leading-tight">{item.name}</h3>
+              <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
             </div>
           ))}
+        </div>
+
+        <div className="grid gap-6 rounded-[2rem] bg-primary p-8 text-primary-foreground shadow-xl shadow-primary/15 lg:grid-cols-[1.1fr_1fr] lg:p-10">
+          <div className="flex flex-col gap-4">
+            <p className="text-sm font-bold uppercase tracking-widest text-accent">US learning support</p>
+            <h3 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">Ready for the classroom, confident beyond it.</h3>
+            <p className="text-base leading-relaxed opacity-90">We currently support families across the United States with learning plans aligned to the standards and pathways that matter to them.</p>
+          </div>
+          <div className="flex flex-wrap content-start gap-3 lg:justify-end">
+            {usBoards.map((board) => (
+              <span key={board} className="rounded-full bg-primary-foreground/10 px-4 py-2 text-sm font-bold ring-1 ring-primary-foreground/20">{board}</span>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-5 rounded-[2rem] border-2 border-dashed border-primary/30 bg-accent/30 p-8 sm:flex-row sm:items-center sm:justify-between lg:p-10">
+          <div className="flex max-w-2xl flex-col gap-2">
+            <p className="text-sm font-bold uppercase tracking-widest text-primary">Start with confidence</p>
+            <h3 className="font-display text-3xl font-extrabold tracking-tight">Your First Demo Lecture is Completely Free</h3>
+            <p className="text-base leading-relaxed text-muted-foreground">A live, personalized session for your child to meet their teacher and experience the Quanttoria difference. No obligation. No credit card.</p>
+          </div>
+          <a href="#contact" className="inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5">Customize your plan</a>
         </div>
 
         <div className="grid gap-10 rounded-[2rem] bg-secondary p-8 lg:grid-cols-[1.2fr_1fr] lg:p-12">

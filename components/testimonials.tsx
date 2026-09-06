@@ -62,10 +62,10 @@ export function Testimonials() {
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
           <div className="flex max-w-2xl flex-col gap-4">
             <p className="text-sm font-bold uppercase tracking-widest text-primary">
-              Parents on Trustpilot
+              Why parents trust us
             </p>
             <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-              What families say about learning with {site.owner.name.split(' ')[0]}
+              Progress feels better when families are part of the journey.
             </h2>
           </div>
           <Button
@@ -76,6 +76,19 @@ export function Testimonials() {
             Read all reviews on Trustpilot
             <ExternalLink className="size-4" aria-hidden="true" />
           </Button>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            ['9,000+', 'teaching hours'],
+            ['1:1', 'live attention'],
+            ['100%', 'personalized plans'],
+          ].map(([value, label]) => (
+            <div key={label} className="rounded-2xl bg-secondary px-5 py-4">
+              <p className="font-display text-3xl font-extrabold text-primary">{value}</p>
+              <p className="text-sm font-bold text-muted-foreground">{label}</p>
+            </div>
+          ))}
         </div>
 
         <ul className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
