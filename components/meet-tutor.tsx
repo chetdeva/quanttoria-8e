@@ -28,11 +28,11 @@ export function MeetTutor() {
     <section id="tutor" className="scroll-mt-20 bg-primary py-20 text-primary-foreground lg:py-28">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.3fr]">
         <div className="relative mx-auto flex w-full max-w-sm flex-col gap-5">
-          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Teachers</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Coaches</p>
           <div className="overflow-hidden rounded-[2.5rem] border-4 border-primary-foreground/20 bg-accent shadow-2xl">
             <Image
               src="/images/princy-avatar.png"
-              alt={`Illustrated portrait of ${site.owner.name}`}
+              alt={`Portrait of ${site.owner.name}`}
               width={640}
               height={640}
               className="h-auto w-full object-cover"
@@ -83,19 +83,16 @@ export function MeetTutor() {
           <div className="relative rounded-3xl bg-primary-foreground/10 p-6 ring-1 ring-primary-foreground/15">
             <Quote className="absolute -top-4 left-6 size-8 text-accent" aria-hidden="true" />
             <p className="text-pretty text-lg leading-relaxed">
-              As educators, we have to stand in the future and work backwards from there. Students
-              need logical thinking more than ever. Throughout my career I&apos;ve guided hundreds
-              of students, nurturing their passion for math and motivating them to pursue advanced
-              education.
+As educators, we have to envision the future and work backwards from there. Today, more than ever, students need the ability to think logically, solve problems, and approach challenges with confidence. Throughout my career, I’ve had the privilege of guiding hundreds of students, nurturing their passion for mathematics and inspiring them to reach for advanced learning and bigger goals.
             </p>
           </div>
 
           <div className="flex flex-col gap-4 text-base leading-relaxed opacity-90">
             <p>
-              With over {site.owner.hours} hours of teaching in Ed-Tech, Princy leads a growing, caring teaching practice for US families. Every learning plan starts with the child—not a package—and changes as they grow.
+              With over {site.owner.hours} hours of teaching in Ed-Tech, Princy leads a growing. Every learning plan starts with the child—not a package—and changes as they grow.
             </p>
             <p>
-              Together, our teachers create an inclusive, supportive learning environment where questions are welcome, progress is visible and every student gets the right kind of challenge.
+              Together, our coaches create an inclusive, interactive, supportive learning environment where questions are welcome, progress is visible and every student gets the right kind of challenge.
             </p>
           </div>
         </div>
