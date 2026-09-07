@@ -6,14 +6,14 @@ export const site = {
   name: 'Quanttoria',
   tagline: 'Personalized learning that makes maths click',
   owner: {
-    name: 'Princy Sugandh',
+    name: 'Pprincy Sugandhh',
     role: 'Founder & Lead Math Educator',
-    hours: '9000+',
+    hours: '20000+',
     linkedinUrl: 'https://www.linkedin.com/in/princysugandh/',
   },
   whatsappNumber: '919119571369',
   whatsappDisplay: '+91 91195 71369',
-  email: 'princyaghaw@gmail.com',
+  email: 'pprincyaaghaww@gmail.com',
   trustpilotUrl:
     'https://www.trustpilot.com/review/byjusfutureschool.com?search=princy&stars=5',
   whatsappMessage:
@@ -27,7 +27,7 @@ export function whatsappLink(message: string = site.whatsappMessage) {
 export const navLinks = [
   { href: '#why', label: 'Why Quanttoria' },
   { href: '#approach', label: 'How it works' },
-  { href: '#tutor', label: 'Meet our Teachers' },
+  { href: '#tutor', label: 'Meet our Coaches' },
   { href: '#reviews', label: 'Why parents trust us' },
   { href: '#contact', label: 'Contact' },
 ]

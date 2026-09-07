@@ -10,11 +10,11 @@ export function Hero() {
         <div className="flex flex-col items-start gap-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-bold text-accent-foreground">
             <Star className="size-4 fill-current" aria-hidden="true" />
-            Personalized 1:1 learning for US students, Grades 1 to 10
+            Personalized 1:1 learning, Grades 1 to 10
           </span>
 
-          <h1 className="font-display text-balance text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            Turn <span className="text-primary">maths fear</span> into{' '}
+          <h1 className="font-display text-balance text-6xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
+            Turn maths into{' '}
             <span className="relative isolate inline-block">
               confidence
               <span
@@ -26,7 +26,7 @@ export function Hero() {
           </h1>
 
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
-            No two learners are alike. {site.name} pairs your child with the right teacher, pace and practice plan to make maths feel clear, doable and even fun—whether they are catching up or reaching for the next challenge.
+            Every child learns differently. {site.name} brings together the expert teacher, pace and practice to help your child feel confident, enjoy learning and thrive in maths—from catching up to reaching their next big milestone.
           </p>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -75,7 +75,7 @@ export function Hero() {
         <div className="relative mx-auto w-full max-w-md lg:max-w-none">
           <div className="relative overflow-hidden rounded-[2.5rem] border-4 border-background bg-sky shadow-2xl shadow-primary/15">
             <Image
-              src="/images/hero-kid-math.png"
+              src="/images/hero-kid-math-realistic.png"
               alt="A smiling child learning math on a laptop, surrounded by fractions, shapes and numbers"
               width={800}
               height={800}
@@ -88,7 +88,7 @@ export function Hero() {
             3/4 + 1/4 = 1
           </div>
           <div className="absolute -right-3 bottom-10 hidden rotate-[5deg] rounded-2xl bg-mint px-4 py-2 font-display text-lg font-bold text-mint-foreground shadow-lg sm:block">
-            Confidence, unlocked
+            Confidence unlocked
           </div>
         </div>
       </div>

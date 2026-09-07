@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     'AP maths support',
     'problem-solving strategies',
     'Quanttoria',
-    'Princy Sugandh',
+    'Pprincy Sugandhh',
   ],
   openGraph: {
     title: 'Quanttoria | Personalized Learning for US Students',

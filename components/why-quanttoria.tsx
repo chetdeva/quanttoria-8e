@@ -6,7 +6,7 @@ const reasons = [
     icon: Eye,
     color: 'bg-primary text-primary-foreground',
     title: 'Understanding first',
-    body: 'We explain the why behind each method, so children build genuine understanding instead of relying on memorised steps.',
+    body: <>We explain the <strong>why</strong> behind each method, so your child builds detailed understanding and reasoning instead of relying on memorised steps.</>,
   },
   {
     icon: Globe2,
@@ -17,14 +17,14 @@ const reasons = [
   {
     icon: Trophy,
     color: 'bg-accent text-accent-foreground',
-    title: 'Ready for what&apos;s next',
-    body: 'Strong foundations and thoughtful challenge help students feel ready for classroom milestones, AP goals and their next big step.',
+    title: "Ready for what's next",
+    body: 'Strong foundations and thoughtful challenges help students feel confident and ready for classroom milestones, competitive exams, AP goals, and their next big step.',
   },
   {
     icon: Sparkles,
     color: 'bg-coral text-coral-foreground',
     title: 'Private and personalised',
-    body: 'Every lesson is shaped around one child: their pace, learning gaps, strengths, goals and confidence.',
+    body: <><strong>Every lesson is shaped around one child</strong>: their pace, learning gaps, strengths, goals and confidence.</>,
   },
 ]
 
@@ -51,11 +51,11 @@ export function WhyQuanttoria() {
               <p className="text-sm font-bold uppercase tracking-widest text-primary">
                 Why Quanttoria
               </p>
-              <h2 className="font-display text-balance text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-                Your child is not bad at maths. They may simply need the right approach.
+              <h2 className="font-display text-balance text-5xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+                Children are not bad or weak at maths. They just need a tailored approach.
               </h2>
               <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-                We meet children where they are, close foundational gaps and build the confidence to reason, apply strategies and keep going when a problem is hard.
+                We meet children where they are and bridge foundational gaps, train them to apply strategies, keep going when a problem is hard and analyse it rightfully.
               </p>
             </div>
 

@@ -111,7 +111,7 @@ export function Testimonials() {
 
         <div className="grid gap-3 sm:grid-cols-3">
           {[
-            ['9,000+', 'teaching hours'],
+            ['20,000+', 'teaching hours'],
             ['1:1', 'live attention'],
             ['100%', 'personalized plans'],
           ].map(([value, label]) => (
