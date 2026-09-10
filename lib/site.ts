@@ -15,7 +15,7 @@ export const site = {
   whatsappDisplay: '+91 91195 71369',
   email: 'pprincyaaghaww@gmail.com',
   trustpilotUrl:
-    'https://www.trustpilot.com/review/byjusfutureschool.com?search=princy&stars=5',
+    'https://www.trustpilot.com/review/byjusfutureschool.com?search=princy&stars=5#search-reviews',
   whatsappMessage:
     "Hi Princy! I'd like to customize a personalized learning plan for my child. My child is in Grade ___.",
 }
