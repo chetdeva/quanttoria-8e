@@ -75,17 +75,15 @@ export function Approach() {
           </div>
         </div>
 
+        <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-xl shadow-primary/10">
+          <img
+            src="/images/how-it-works-tree.png"
+            alt="SmartEdWise-inspired learning journey tree showing registration, demo, enrolment, regular sessions, feedback, tests, competitions, and mentorship"
+            className="h-auto w-full object-contain"
+          />
+        </div>
+
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="pointer-events-none absolute inset-x-8 top-20 hidden h-28 lg:block" aria-hidden="true">
-            <div className="absolute bottom-0 left-1/2 h-24 w-3 -translate-x-1/2 rounded-full bg-primary/80" />
-            <div className="absolute bottom-16 left-[43%] h-16 w-3 rotate-[38deg] rounded-full bg-primary/70" />
-            <div className="absolute bottom-16 left-[57%] h-16 w-3 -rotate-[38deg] rounded-full bg-primary/70" />
-            <div className="absolute left-[28%] top-0 size-16 rounded-full bg-mint/80" />
-            <div className="absolute left-[40%] top-8 size-20 rounded-full bg-accent/90" />
-            <div className="absolute right-[29%] top-0 size-16 rounded-full bg-coral/70" />
-            <div className="absolute right-[39%] top-10 size-14 rounded-full bg-primary/25" />
-          </div>
-          <div aria-hidden="true" className="absolute left-[12%] right-[12%] top-8 hidden border-t-2 border-dashed border-primary/25 lg:block" />
           {journey.map((item) => (
             <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
               <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg transition-transform group-hover:rotate-3 ${item.tint}`}>
