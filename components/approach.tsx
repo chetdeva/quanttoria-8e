@@ -77,8 +77,8 @@ export function Approach() {
 
         <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-xl shadow-primary/10">
           <img
-            src="/images/how-it-works-tree.png"
-            alt="SmartEdWise-inspired learning journey tree showing registration, demo, enrolment, regular sessions, feedback, tests, competitions, and mentorship"
+            src="/images/quanttoria-learning-tree.png"
+            alt="Quanttoria learning journey tree showing curiosity, discovery, practice, growth, confidence, mastery, and future readiness"
             className="h-auto w-full object-contain"
           />
         </div>
