@@ -75,8 +75,15 @@ export function Approach() {
           </div>
         </div>
 
+        <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-xl shadow-primary/10">
+          <img
+            src="/images/quanttoria-learning-tree.png"
+            alt="Quanttoria learning journey tree showing curiosity, discovery, practice, growth, confidence, mastery, and future readiness"
+            className="h-auto w-full object-contain"
+          />
+        </div>
+
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div aria-hidden="true" className="absolute left-[12%] right-[12%] top-8 hidden border-t-2 border-dashed border-primary/25 lg:block" />
           {journey.map((item) => (
             <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
               <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg transition-transform group-hover:rotate-3 ${item.tint}`}>
@@ -117,7 +124,7 @@ export function Approach() {
             <h3 className="font-display text-3xl font-extrabold tracking-tight">Your first demo lecture is free</h3>
             <p className="text-base leading-relaxed text-muted-foreground">A live, personalized session for your child to meet their teacher and experience the Quanttoria difference. No obligation.</p>
           </div>
-          <a href="#contact" className="inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5">Customize your plan</a>
+          <a href="#demo" className="inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5">Book your free demo</a>
         </div>
 
         <div className="grid gap-10 rounded-[2rem] bg-secondary p-8 lg:grid-cols-[1.2fr_1fr] lg:p-12">

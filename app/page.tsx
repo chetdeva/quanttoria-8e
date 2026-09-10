@@ -6,6 +6,7 @@ import { MeetTutor } from '@/components/meet-tutor'
 import { Testimonials } from '@/components/testimonials'
 import { Contact } from '@/components/contact'
 import { SiteFooter } from '@/components/site-footer'
+import { DemoDialog } from '@/components/demo-dialog'
 
 export default function Page() {
   return (
@@ -20,6 +21,7 @@ export default function Page() {
         <Contact />
       </main>
       <SiteFooter />
+      <DemoDialog />
     </>
   )
 }
