@@ -76,6 +76,15 @@ export function Approach() {
         </div>
 
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="pointer-events-none absolute inset-x-8 top-20 hidden h-28 lg:block" aria-hidden="true">
+            <div className="absolute bottom-0 left-1/2 h-24 w-3 -translate-x-1/2 rounded-full bg-primary/80" />
+            <div className="absolute bottom-16 left-[43%] h-16 w-3 rotate-[38deg] rounded-full bg-primary/70" />
+            <div className="absolute bottom-16 left-[57%] h-16 w-3 -rotate-[38deg] rounded-full bg-primary/70" />
+            <div className="absolute left-[28%] top-0 size-16 rounded-full bg-mint/80" />
+            <div className="absolute left-[40%] top-8 size-20 rounded-full bg-accent/90" />
+            <div className="absolute right-[29%] top-0 size-16 rounded-full bg-coral/70" />
+            <div className="absolute right-[39%] top-10 size-14 rounded-full bg-primary/25" />
+          </div>
           <div aria-hidden="true" className="absolute left-[12%] right-[12%] top-8 hidden border-t-2 border-dashed border-primary/25 lg:block" />
           {journey.map((item) => (
             <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
@@ -117,7 +126,7 @@ export function Approach() {
             <h3 className="font-display text-3xl font-extrabold tracking-tight">Your first demo lecture is free</h3>
             <p className="text-base leading-relaxed text-muted-foreground">A live, personalized session for your child to meet their teacher and experience the Quanttoria difference. No obligation.</p>
           </div>
-          <a href="#contact" className="inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5">Customize your plan</a>
+          <a href="#demo" className="inline-flex shrink-0 items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5">Book your free demo</a>
         </div>
 
         <div className="grid gap-10 rounded-[2rem] bg-secondary p-8 lg:grid-cols-[1.2fr_1fr] lg:p-12">
