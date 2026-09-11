@@ -31,7 +31,7 @@ export function MeetTutor() {
           <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Coaches</p>
           <div className="overflow-hidden rounded-[2.5rem] border-4 border-primary-foreground/20 bg-accent shadow-2xl">
             <Image
-              src="/images/princy-avatar.png"
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-09-07%20at%2010.38.02%20PM-iZtGml5nzUiPQoc6yx1X6ngQDdgDKl.jpeg"
               alt={`Portrait of ${site.owner.name}`}
               width={640}
               height={640}

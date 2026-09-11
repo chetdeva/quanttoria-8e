@@ -60,27 +60,29 @@ export function Approach() {
   return (
     <section id="approach" className="scroll-mt-20 py-20 lg:py-28">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-14 px-4 sm:px-6">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
-          <p className="text-sm font-bold uppercase tracking-widest text-primary">How Quanttoria works</p>
-          <h2 className="font-display text-balance text-5xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-            A learning plan that grows with your child.
-          </h2>
-          <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
-            Personalized learning is more than a worksheet with a name on it. We combine a thoughtful teacher, the right challenge and regular parent feedback to make every lesson count.
-          </p>
-          <div className="flex flex-wrap justify-center gap-2 pt-2 text-xs font-bold uppercase tracking-wide text-primary">
-            <span className="rounded-full bg-accent px-3 py-1.5">At their pace</span>
-            <span className="rounded-full bg-secondary px-3 py-1.5">For their goals</span>
-            <span className="rounded-full bg-mint/30 px-3 py-1.5">With real feedback</span>
+        <div className="grid items-center gap-8 md:grid-cols-[1.15fr_0.85fr] lg:gap-14">
+          <div className="flex max-w-3xl flex-col gap-4">
+            <p className="text-sm font-bold uppercase tracking-widest text-primary">How Quanttoria works</p>
+            <h2 className="font-display text-balance text-5xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+              A learning plan that grows with your child.
+            </h2>
+            <p className="text-pretty text-lg leading-relaxed text-muted-foreground">
+              Personalized learning is more than a worksheet with a name on it. We combine a thoughtful teacher, the right challenge and regular parent feedback to make every lesson count.
+            </p>
+            <div className="flex flex-wrap gap-2 pt-2 text-xs font-bold uppercase tracking-wide text-primary">
+              <span className="rounded-full bg-accent px-3 py-1.5">At their pace</span>
+              <span className="rounded-full bg-secondary px-3 py-1.5">For their goals</span>
+              <span className="rounded-full bg-mint/30 px-3 py-1.5">With real feedback</span>
+            </div>
           </div>
-        </div>
 
-        <div className="overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-xl shadow-primary/10">
-          <img
-            src="/images/quanttoria-learning-tree.png"
-            alt="Quanttoria learning journey tree showing curiosity, discovery, practice, growth, confidence, mastery, and future readiness"
-            className="h-auto w-full object-contain"
-          />
+          <div className="mx-auto w-full max-w-sm overflow-hidden rounded-[2rem] border border-border/70 bg-card shadow-xl shadow-primary/10">
+            <img
+              src="/images/quanttoria-learning-tree.png"
+              alt="Quanttoria learning journey tree showing curiosity, discovery, practice, growth, confidence, mastery, and future readiness"
+              className="h-auto w-full object-contain"
+            />
+          </div>
         </div>
 
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
