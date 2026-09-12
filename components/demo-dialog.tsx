@@ -6,6 +6,15 @@ import { whatsappLink } from '@/lib/site'
 import { WhatsAppIcon } from '@/components/whatsapp-icon'
 
 const grades = ['Grade 1', 'Grade 2', 'Grade 3', 'Grade 4', 'Grade 5', 'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10']
+const timeZones = [
+  { value: 'America/New_York', label: 'Eastern Time (ET)' },
+  { value: 'America/Chicago', label: 'Central Time (CT)' },
+  { value: 'America/Denver', label: 'Mountain Time (MT)' },
+  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+  { value: 'America/Anchorage', label: 'Alaska Time (AKT)' },
+  { value: 'Pacific/Honolulu', label: 'Hawaii Time (HT)' },
+]
+
 
 export function DemoDialog() {
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -33,7 +42,9 @@ export function DemoDialog() {
     const child = String(data.get('child') ?? '')
     const grade = String(data.get('grade') ?? '')
     const phone = String(data.get('phone') ?? '')
-    const message = `Hi Princy! I'd like to book a free demo lecture.\n\nParent: ${parent}\nChild: ${child}\nGrade: ${grade}\nPhone: ${phone}`
+    const timeZone = String(data.get('timeZone') ?? '')
+    const timeSlot = String(data.get('timeSlot') ?? '')
+    const message = `Hi Princy! I'd like to book a free demo lecture.\n\nParent: ${parent}\nChild: ${child}\nGrade: ${grade}\nPhone: ${phone}\nTime zone: ${timeZone}\nPreferred time: ${timeSlot}`
     window.open(whatsappLink(message), '_blank', 'noopener,noreferrer')
     setSubmitted(true)
   }
@@ -70,6 +81,14 @@ export function DemoDialog() {
                 <select id="demo-grade" name="grade" required defaultValue="" className="h-11 rounded-xl border-2 border-input bg-background px-3 text-base font-normal outline-none focus-visible:border-primary"><option value="" disabled>Select grade</option>{grades.map((grade) => <option key={grade}>{grade}</option>)}</select>
               </label>
               <Field label="WhatsApp number" name="phone" placeholder="Your number" type="tel" />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <label className="flex flex-col gap-2 text-sm font-bold" htmlFor="demo-time-zone">Your time zone
+                <select id="demo-time-zone" name="timeZone" required defaultValue="" className="h-11 rounded-xl border-2 border-input bg-background px-3 text-base font-normal outline-none focus-visible:border-primary"><option value="" disabled>Select time zone</option>{timeZones.map((timeZone) => <option key={timeZone.value} value={timeZone.label}>{timeZone.label}</option>)}</select>
+              </label>
+              <label className="flex flex-col gap-2 text-sm font-bold" htmlFor="demo-time-slot">Convenient date and time
+                <input id="demo-time-slot" name="timeSlot" type="datetime-local" required className="h-11 rounded-xl border-2 border-input bg-background px-3 text-base font-normal outline-none focus-visible:border-primary" />
+              </label>
             </div>
             <button type="submit" className="mt-2 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-6 text-base font-bold text-primary-foreground shadow-lg transition-transform hover:-translate-y-0.5"><WhatsAppIcon className="size-5" /> Request my free demo</button>
             <p className="text-center text-xs leading-relaxed text-muted-foreground">We&apos;ll only use these details to coordinate your demo lesson.</p>
