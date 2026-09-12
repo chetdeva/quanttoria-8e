@@ -36,14 +36,6 @@ export function SiteFooter() {
           <a href={`mailto:${site.email}`} className="font-semibold text-muted-foreground hover:text-primary">
             {site.email}
           </a>
-          <a
-            href={site.trustpilotUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-semibold text-muted-foreground hover:text-primary"
-          >
-            Trustpilot
-          </a>
         </div>
       </div>
       <div className="mx-auto mt-10 w-full max-w-6xl px-4 text-xs text-muted-foreground sm:px-6">

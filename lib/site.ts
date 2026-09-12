@@ -27,7 +27,7 @@ export function whatsappLink(message: string = site.whatsappMessage) {
 export const navLinks = [
   { href: '#why', label: 'Why Quanttoria' },
   { href: '#approach', label: 'How it works' },
-  { href: '#tutor', label: 'Meet our Coaches' },
+  { href: '#tutor', label: 'Meet our founder' },
   { href: '#reviews', label: 'Why parents trust us' },
   { href: '#contact', label: 'Contact' },
 ]
