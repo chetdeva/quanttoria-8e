@@ -28,7 +28,7 @@ export function MeetTutor() {
     <section id="tutor" className="scroll-mt-20 bg-primary py-20 text-primary-foreground lg:py-28">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-[1fr_1.3fr]">
         <div className="relative mx-auto flex w-full max-w-sm flex-col gap-5">
-          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our Coaches</p>
+          <p className="text-sm font-bold uppercase tracking-widest text-accent">Meet our founder</p>
           <div className="overflow-hidden rounded-[2.5rem] border-4 border-primary-foreground/20 bg-accent shadow-2xl">
             <Image
               src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp%20Image%202026-09-07%20at%2010.38.02%20PM-iZtGml5nzUiPQoc6yx1X6ngQDdgDKl.jpeg"
