@@ -1,3 +1,8 @@
 import { requireRole } from '@/lib/auth'
 import { SignOutButton } from '@/components/sign-out-button'
-export default async function StudentDashboard() { const { profile } = await requireRole('student'); return <main className="min-h-screen bg-sky px-4 py-10"><div className="mx-auto max-w-5xl"><div className="flex items-center justify-between"><span className="font-display text-2xl font-extrabold text-primary">Quanttoria</span><SignOutButton /></div><section className="mt-16 rounded-3xl border border-border bg-card p-8 shadow-sm"><p className="text-sm font-bold uppercase tracking-widest text-mint-foreground">Student space</p><h1 className="mt-3 font-display text-4xl font-extrabold">Ready to grow, {profile.full_name}?</h1><p className="mt-4 max-w-xl text-lg text-muted-foreground">Your personalized learning journey starts here. Your tutor will help you turn every challenge into a breakthrough.</p></section></div></main> }
+import { StudentCalendar } from '@/components/class-calendar'
+
+export default async function StudentDashboard() {
+  const { profile } = await requireRole('student')
+  return <><StudentCalendar profileName={profile.full_name} /><div className="fixed right-4 top-4"><SignOutButton /></div></>
+}
