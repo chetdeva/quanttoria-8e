@@ -32,9 +32,9 @@ export function SiteHeader() {
         <div className="hidden md:block">
           <Button
             className="rounded-full font-bold"
-            nativeButton={false} render={<a href="#contact" />}
+            nativeButton={false} render={<Link href="/login" />}
           >
-            Customize your plan
+            Login
           </Button>
         </div>
 
