@@ -20,6 +20,7 @@ export function StudentCalendar({ profileName }: { profileName: string }) {
   const [topic, setTopic] = useState('')
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
+  const [timezone, setTimezone] = useState('UTC')
   const supabase = useMemo(() => createClient(), [])
 
   async function load() {
@@ -31,7 +32,10 @@ export function StudentCalendar({ profileName }: { profileName: string }) {
     setBookings((bookingsData ?? []) as unknown as Booking[])
     setLoading(false)
   }
-  useEffect(() => { void load() }, [])
+  useEffect(() => {
+    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    void load()
+  }, [])
 
   async function book() {
     if (!selected) return
@@ -50,7 +54,7 @@ export function StudentCalendar({ profileName }: { profileName: string }) {
 
   return <main className="min-h-screen bg-sky px-4 py-8 sm:px-8"><div className="mx-auto max-w-6xl">
     <header className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Student space</p><h1 className="mt-2 font-display text-4xl font-extrabold">Your learning calendar, {profileName.split(' ')[0]}</h1><p className="mt-2 text-muted-foreground">Pick a time that works for you and make it count.</p></div><Button variant="outline" onClick={() => void load()}><RefreshCw data-icon="inline-start" />Refresh</Button></header>
-    <div className="mt-8 grid gap-5 md:grid-cols-3"><Stat label="Class credits" value="8" tone="bg-accent" /><Stat label="Upcoming classes" value={String(bookings.filter((b) => b.status === 'confirmed').length)} tone="bg-mint" /><Stat label="Your timezone" value={Intl.DateTimeFormat().resolvedOptions().timeZone} tone="bg-card" /></div>
+    <div className="mt-8 grid gap-5 md:grid-cols-3"><Stat label="Class credits" value="8" tone="bg-accent" /><Stat label="Upcoming classes" value={String(bookings.filter((b) => b.status === 'confirmed').length)} tone="bg-mint" /><Stat label="Your timezone" value={timezone} tone="bg-card" /></div>
     <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"><div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-2xl font-extrabold">Open class times</h2><p className="text-sm text-muted-foreground">All times are shown in your local timezone.</p></div><CalendarDays className="text-primary" /></div>{loading ? <p className="py-12 text-center text-muted-foreground">Loading available classes...</p> : sessions.length === 0 ? <div className="py-12 text-center"><CalendarDays className="mx-auto text-muted-foreground" /><p className="mt-3 font-bold">No open times yet</p><p className="mt-1 text-sm text-muted-foreground">Your teacher will publish the next available class here.</p></div> : <div className="mt-5 grid gap-3">{sessions.map((session) => <button key={session.id} type="button" onClick={() => setSelected(session)} className="flex items-center justify-between rounded-2xl border border-border p-4 text-left transition hover:border-primary hover:bg-secondary"><span><span className="block font-bold">{formatDate(session.starts_at)}</span><span className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><Clock3 className="size-4" />{formatTime(session.starts_at)} – {formatTime(session.ends_at)} · {session.title}</span></span><span className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-mint-foreground">Book</span></button>)}</div>}</div>
       <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-2xl font-extrabold">Your classes</h2><p className="text-sm text-muted-foreground">Keep your momentum going.</p></div><Users className="text-coral" /></div><div className="mt-5 flex flex-col gap-3">{bookings.length === 0 ? <p className="py-8 text-sm text-muted-foreground">Booked classes will appear here.</p> : bookings.map((booking) => <div key={booking.id} className="rounded-2xl bg-secondary p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-bold">{booking.class_sessions?.title ?? 'Class'}</p><p className="mt-1 text-sm text-muted-foreground">{booking.class_sessions ? `${formatDate(booking.class_sessions.starts_at)} · ${formatTime(booking.class_sessions.starts_at)}` : ''}</p></div><span className="text-xs font-bold uppercase text-mint-foreground">{booking.status}</span></div>{booking.status === 'confirmed' && <Button className="mt-3 w-full" variant="outline" size="sm" onClick={() => void cancel(booking)}>Cancel class</Button>}</div>)}</div></div></section>
     {message && <p role="status" className="mt-5 rounded-xl bg-mint p-3 text-sm font-bold text-mint-foreground">{message}</p>}
