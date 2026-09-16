@@ -38,19 +38,7 @@ export function MeetTutor() {
               className="h-auto w-full object-cover"
             />
           </div>
-          <dl className="mt-6 grid grid-cols-2 gap-3">
-            {credentials.map((c) => (
-              <div
-                key={c.label}
-                className="rounded-2xl bg-primary-foreground/10 px-4 py-3 ring-1 ring-primary-foreground/15"
-              >
-                <dt className="text-xs font-semibold uppercase tracking-wide opacity-80">
-                  {c.label}
-                </dt>
-                <dd className="font-display text-xl font-extrabold">{c.value}</dd>
-              </div>
-            ))}
-          </dl>
+
         </div>
 
         <div className="flex flex-col gap-6">
@@ -89,11 +77,16 @@ As educators, we have to envision the future and work backwards from there. Toda
 
           <div className="flex flex-col gap-4 text-base leading-relaxed opacity-90">
             <p>
-              With over {site.owner.hours} hours of teaching in Ed-Tech, Princy leads a growing. Every learning plan starts with the child—not a package—and changes as they grow.
-            </p>
-            <p>
               Together, our coaches create an inclusive, interactive, supportive learning environment where questions are welcome, progress is visible and every student gets the right kind of challenge.
             </p>
+            <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {credentials.map((c) => (
+                <div key={c.label} className="rounded-2xl bg-primary-foreground/10 px-4 py-3 ring-1 ring-primary-foreground/15">
+                  <dt className="text-xs font-semibold uppercase tracking-wide opacity-80">{c.label}</dt>
+                  <dd className="font-display text-xl font-extrabold">{c.value}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </div>
       </div>

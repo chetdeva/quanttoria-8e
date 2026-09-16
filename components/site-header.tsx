@@ -29,16 +29,16 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="flex items-center gap-2">
           <Button
-            className="rounded-full font-bold"
+            size="lg"
+            className="rounded-full px-5 font-bold shadow-md shadow-primary/20"
             nativeButton={false} render={<Link href="/login" />}
           >
             Login
           </Button>
-        </div>
 
-        <button
+          <button
           type="button"
           className="inline-flex size-10 items-center justify-center rounded-full text-foreground md:hidden"
           aria-expanded={open}
@@ -47,7 +47,8 @@ export function SiteHeader() {
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X className="size-5" /> : <Menu className="size-5" />}
-        </button>
+          </button>
+        </div>
       </div>
 
       {open && (
@@ -68,9 +69,9 @@ export function SiteHeader() {
           ))}
           <Button
             className="mt-2 rounded-full font-bold"
-            nativeButton={false} render={<a href="#contact" />}
+            nativeButton={false} render={<Link href="/login" />}
           >
-            Customize your plan
+            Login
           </Button>
         </nav>
       )}
