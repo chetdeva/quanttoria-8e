@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { LoaderCircle } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -131,9 +132,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
           )}
 
           {mode === 'login' && <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline">Forgot password?</Link>}
-          <Button type="submit" disabled={loading} className="mt-2 w-full rounded-full font-bold">
+          <Button type="submit" disabled={loading} aria-busy={loading} className="mt-2 w-full rounded-full font-bold">
+            {loading && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
             {loading ? 'Please wait…' : mode === 'login' ? 'Login' : mode === 'signup' ? 'Create account' : 'Send reset link'}
           </Button>
+          {loading && <p className="sr-only" role="status">Submitting, please wait.</p>}
           {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
         </form>
 
