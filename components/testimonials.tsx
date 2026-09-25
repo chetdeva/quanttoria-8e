@@ -154,7 +154,7 @@ export function Testimonials() {
           <div className="mt-5 flex items-center justify-center gap-2" aria-label="Choose a testimonial">
             {reviews.map((review, index) => (
               <button
-                key={`${review.name}-dot`}
+                key={`${review.name}-${index}-dot`}
                 type="button"
                 onClick={() => scrollToReview(index)}
                 aria-label={`Show testimonial ${index + 1}`}
