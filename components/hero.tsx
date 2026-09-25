@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { ArrowRight, LogIn, Star } from 'lucide-react'
+import { ArrowRight, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { site } from '@/lib/site'
 
@@ -36,15 +36,6 @@ export function Hero() {
               nativeButton={false} render={<a href="#contact" />}
             >
               Customize your plan
-            </Button>
-            <Button
-              size="lg"
-              variant="secondary"
-              className="h-12 rounded-full px-6 text-base font-bold shadow-sm"
-              nativeButton={false} render={<a href="/login" />}
-            >
-              Login
-              <LogIn className="size-5" aria-hidden="true" />
             </Button>
             <Button
               size="lg"
