@@ -33,9 +33,9 @@ export function Hero() {
             <Button
               size="lg"
               className="h-12 rounded-full px-6 text-base font-bold"
-              nativeButton={false} render={<a href="#contact" />}
-            >
-              Customize your plan
+nativeButton={false} render={<a href="#demo" />}
+              >
+              Book your free demo
             </Button>
             <Button
               size="lg"
