@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react'
 import { Logo } from '@/components/logo'
@@ -34,6 +34,20 @@ function GoogleIcon() {
 const redirectUrl = () =>
   process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`
 
+const OAUTH_POPUP_MESSAGE = 'quanttoria-oauth-callback'
+
+function openOAuthPopup(url: string) {
+  const width = 480
+  const height = 640
+  const left = window.screenX + Math.max(0, (window.outerWidth - width) / 2)
+  const top = window.screenY + Math.max(0, (window.outerHeight - height) / 2)
+  return window.open(
+    url,
+    'quanttoria-google-signin',
+    `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
+  )
+}
+
 export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' | 'forgot' }) {
   const isSignup = mode === 'signup' || mode === 'admin-signup'
   const isAdminSignup = mode === 'admin-signup'
@@ -47,20 +61,61 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const popupRef = useRef<Window | null>(null)
+
+  useEffect(() => {
+    function handleMessage(event: MessageEvent) {
+      if (event.origin !== window.location.origin) return
+      const data = event.data as { type?: string; success?: boolean } | undefined
+      if (data?.type !== OAUTH_POPUP_MESSAGE) return
+
+      popupRef.current?.close()
+      popupRef.current = null
+
+      if (data.success) {
+        window.location.href = '/dashboard'
+      } else {
+        setGoogleLoading(false)
+        setMessage('We could not complete Google sign-in. Please try again.')
+      }
+    }
+
+    window.addEventListener('message', handleMessage)
+    return () => window.removeEventListener('message', handleMessage)
+  }, [])
 
   async function signInWithGoogle() {
     setMessage('')
     setGoogleLoading(true)
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: redirectUrl() },
+        options: { redirectTo: redirectUrl(), skipBrowserRedirect: true },
       })
-      if (error) {
+      if (error || !data?.url) {
         setMessage('We could not start Google sign-in. Please try again.')
         setGoogleLoading(false)
+        return
       }
+
+      const popup = openOAuthPopup(data.url)
+      if (!popup) {
+        setMessage('Please allow pop-ups for this site to sign in with Google.')
+        setGoogleLoading(false)
+        return
+      }
+      popupRef.current = popup
+
+      const pollClosed = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(pollClosed)
+          if (popupRef.current) {
+            popupRef.current = null
+            setGoogleLoading(false)
+          }
+        }
+      }, 500)
     } catch {
       setMessage('We could not start Google sign-in. Please try again.')
       setGoogleLoading(false)
