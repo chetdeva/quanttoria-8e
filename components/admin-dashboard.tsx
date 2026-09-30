@@ -50,10 +50,10 @@ type Booking = {
 }
 
 type DashboardProps = {
-  currentUser: { full_name: string | null; email: string | null }
+  currentUser: { id: string; full_name: string | null; email: string | null; role: string }
   profiles: Array<{ id: string; full_name: string | null; email: string | null; role: string }>
   sessions: Array<{ id: string; teacher_id: string; title: string; starts_at: string; ends_at: string; status: string; topic: string | null }>
-  bookings: Array<{ id: string; session_id: string; student_id: string; status: string; topic: string | null; created_at: string; class_sessions: DashboardProps['sessions'][number] | null }>
+  bookings: Array<{ id: string; session_id: string; student_id: string; status: string; topic: string | null; created_at: string; class_sessions: DashboardProps['sessions'][number] | DashboardProps['sessions'][number][] | null }>
 }
 
 function formatBookingTime(value: string) {
@@ -74,10 +74,14 @@ function downloadReport(bookings: Booking[]) {
   URL.revokeObjectURL(url)
 }
 
+function getBookingSession(booking: DashboardProps['bookings'][number]) {
+  return Array.isArray(booking.class_sessions) ? booking.class_sessions[0] : booking.class_sessions
+}
+
 function createDashboardData({ profiles, bookings }: Pick<DashboardProps, 'profiles' | 'bookings'>) {
   const byId = new Map(profiles.map((profile) => [profile.id, profile]))
   const rows: Booking[] = bookings.map((booking) => {
-    const session = booking.class_sessions
+    const session = getBookingSession(booking)
     const student = byId.get(booking.student_id)
     const teacher = session ? byId.get(session.teacher_id) : null
     return {
@@ -87,7 +91,7 @@ function createDashboardData({ profiles, bookings }: Pick<DashboardProps, 'profi
     }
   })
   const students = profiles.filter((profile) => profile.role === 'student').map((profile) => ({ name: profile.full_name ?? 'Unnamed student', email: profile.email ?? '', teacher: 'Not assigned', bookings: bookings.filter((booking) => booking.student_id === profile.id).length, credits: '—', status: 'Active', initials: initials(profile.full_name ?? 'Student') }))
-  const teachers = profiles.filter((profile) => profile.role === 'teacher').map((profile) => ({ name: profile.full_name ?? 'Unnamed teacher', email: profile.email ?? '', specialty: 'Maths tutor', sync: 'Synced', pending: bookings.filter((booking) => booking.class_sessions?.teacher_id === profile.id && booking.status === 'confirmed').length, initials: initials(profile.full_name ?? 'Teacher') }))
+  const teachers = profiles.filter((profile) => profile.role === 'teacher').map((profile) => ({ name: profile.full_name ?? 'Unnamed teacher', email: profile.email ?? '', specialty: 'Maths tutor', sync: 'Synced', pending: bookings.filter((booking) => getBookingSession(booking)?.teacher_id === profile.id && booking.status === 'confirmed').length, initials: initials(profile.full_name ?? 'Teacher') }))
   return { bookings: rows, students, teachers }
 }
 
@@ -108,10 +112,34 @@ export default function AdminDashboard({ currentUser, profiles, sessions, bookin
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [notice, setNotice] = useState('')
   const [panel, setPanel] = useState<'notifications' | 'profile' | 'settings' | 'quick-actions' | null>(null)
+  const [profileName, setProfileName] = useState(currentUser.full_name ?? '')
+  const [savedProfileName, setSavedProfileName] = useState(currentUser.full_name ?? '')
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [isSavingProfile, setIsSavingProfile] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
 
   const filteredBookings = useMemo(() => bookings.filter((booking) => `${booking.student} ${booking.teacher} ${booking.id}`.toLowerCase().includes(query.toLowerCase())), [query])
   const showNotice = (message: string) => { setNotice(message); window.setTimeout(() => setNotice(''), 2200) }
+  const saveProfile = async () => {
+    const fullName = profileName.trim()
+    if (!fullName) return showNotice('Please enter your name')
+    setIsSavingProfile(true)
+    const { error } = await createClient().from('profiles').update({ full_name: fullName }).eq('id', currentUser.id)
+    setIsSavingProfile(false)
+    if (error) return showNotice('Profile could not be updated')
+    setSavedProfileName(fullName)
+    setIsEditingProfile(false)
+    showNotice('Profile updated')
+  }
+  const signOut = async () => {
+    setIsSigningOut(true)
+    const { error } = await createClient().auth.signOut()
+    if (error) {
+      setIsSigningOut(false)
+      return showNotice('Could not log out')
+    }
+    window.location.href = '/'
+  }
 
   return (
     <div className="min-h-screen bg-[#f7f8fc] text-foreground">
@@ -129,16 +157,15 @@ export default function AdminDashboard({ currentUser, profiles, sessions, bookin
         <div className="mt-auto px-4 pb-5">
           <div className="rounded-2xl bg-[#f1f5ff] p-4"><div className="flex items-center gap-2 text-xs font-bold text-primary"><ShieldCheck className="size-4" />System healthy</div><p className="mt-2 text-xs leading-5 text-muted-foreground">All services are operating normally.</p><div className="mt-3 h-1.5 overflow-hidden rounded-full bg-primary/10"><div className="h-full w-[98%] rounded-full bg-primary" /></div></div>
           <button onClick={() => setPanel('settings')} className="mt-4 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted"><Settings2 className="size-[18px]" />Workspace settings</button>
-          <button onClick={async () => { setIsSigningOut(true); await createClient().auth.signOut(); window.location.href = '/' }} disabled={isSigningOut} className="mt-2 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted disabled:opacity-60"><LogOut className="size-[18px]" />{isSigningOut ? 'Signing out…' : 'Log out'}</button>
         </div>
       </aside>
       <main className={`min-h-screen transition-[margin] ${sidebarOpen ? 'ml-[248px]' : 'ml-0'}`}>
         <header className="sticky top-0 z-20 flex h-[76px] items-center justify-between border-b border-border/70 bg-white/90 px-8 backdrop-blur-md">
           <div className="flex items-center gap-4"><Button variant="ghost" size="icon" aria-label="Toggle sidebar" onClick={() => setSidebarOpen(!sidebarOpen)}><PanelLeft /></Button><div className="relative hidden w-[300px] md:block"><Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search students, teachers, bookings" className="h-9 w-full rounded-lg border border-border bg-muted/40 pl-9 pr-14 text-xs outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10" /><kbd className="absolute right-2 top-1/2 -translate-y-1/2 rounded border border-border bg-white px-1.5 py-0.5 text-[10px] text-muted-foreground">⌘ K</kbd></div></div>
-          <div className="flex items-center gap-3"><div className="hidden items-center gap-5 text-xs font-semibold text-muted-foreground lg:flex"><span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-mint-foreground" />Active bookings <strong className="text-foreground">{rawBookings.length}</strong></span><span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-coral" />Failed syncs <strong className="text-foreground">0</strong></span></div><Button variant="ghost" size="icon" aria-label="Notifications" onClick={() => setPanel('notifications')}><Bell /></Button><button onClick={() => setPanel('profile')} className="flex items-center gap-2 border-l border-border pl-3 text-left"><Avatar initials={initials(currentUser.full_name ?? 'Administrator')} tone="yellow" /><div className="hidden sm:block"><p className="text-xs font-bold">{currentUser.full_name ?? 'Administrator'}</p><p className="text-[10px] text-muted-foreground">Administrator</p></div><ChevronDown className="size-4 text-muted-foreground" /></button></div>
+          <div className="flex items-center gap-3"><div className="hidden items-center gap-5 text-xs font-semibold text-muted-foreground lg:flex"><span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-mint-foreground" />Active bookings <strong className="text-foreground">{rawBookings.length}</strong></span><span className="flex items-center gap-1.5"><span className="size-2 rounded-full bg-coral" />Failed syncs <strong className="text-foreground">0</strong></span></div><Button variant="ghost" size="icon" aria-label="Notifications" onClick={() => setPanel('notifications')}><Bell /></Button><button onClick={() => setPanel('profile')} className="flex items-center gap-2 border-l border-border pl-3 text-left"><Avatar initials={initials(savedProfileName || 'Administrator')} tone="yellow" /><div className="hidden sm:block"><p className="text-xs font-bold">{savedProfileName || 'Administrator'}</p><p className="text-[10px] text-muted-foreground">Administrator</p></div><ChevronDown className="size-4 text-muted-foreground" /></button></div>
         </header>
         <div className="mx-auto max-w-[1400px] px-8 py-8">
-          <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date())}</p><h1 className="mt-2 font-display text-3xl font-bold tracking-tight">Good morning, {currentUser.full_name ?? 'Administrator'}.</h1><p className="mt-1 text-sm text-muted-foreground">Here&apos;s what&apos;s happening across your learning network.</p></div><div className="flex gap-2"><Button variant="outline" onClick={() => { downloadReport(bookings); showNotice('Report downloaded') }}><Download data-icon="inline-start" />Export report</Button><Button onClick={() => setPanel('quick-actions')}><Zap data-icon="inline-start" />Quick action</Button></div></div>
+          <div className="flex flex-wrap items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">{new Intl.DateTimeFormat('en-US', { dateStyle: 'full' }).format(new Date())}</p><h1 className="mt-2 font-display text-3xl font-bold tracking-tight">Good morning, {savedProfileName || 'Administrator'}.</h1><p className="mt-1 text-sm text-muted-foreground">Here&apos;s what&apos;s happening across your learning network.</p></div><div className="flex gap-2"><Button variant="outline" onClick={() => { downloadReport(bookings); showNotice('Report downloaded') }}><Download data-icon="inline-start" />Export report</Button><Button onClick={() => setPanel('quick-actions')}><Zap data-icon="inline-start" />Quick action</Button></div></div>
           <div className="mt-8 flex items-center gap-1 overflow-x-auto border-b border-border/70">{tabs.map((tab) => <button key={tab} onClick={() => setActiveTab(tab)} className={`whitespace-nowrap border-b-2 px-4 pb-3 text-sm font-bold transition-colors ${activeTab === tab ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}>{tab}</button>)}</div>
           {activeTab === tabs[0] && <Overview filteredBookings={filteredBookings} onSelect={setSelectedBooking} showNotice={showNotice} teachersCount={teachers.length} studentsCount={students.length} />}
           {activeTab === tabs[1] && <ManagementTable title="Students" subtitle="Manage learner accounts, credits, and teacher assignments." rows={students} query={query} setQuery={setQuery} type="student" onAction={showNotice} />}
@@ -149,7 +176,7 @@ export default function AdminDashboard({ currentUser, profiles, sessions, bookin
       {panel && <div className="fixed inset-0 z-40 flex items-start justify-end bg-foreground/10 p-4 pt-20 backdrop-blur-[2px]" onClick={() => setPanel(null)}><section className="w-full max-w-sm rounded-2xl border border-border bg-white p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
         <div className="flex items-start justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">Admin workspace</p><h2 className="mt-2 font-display text-2xl font-bold">{panel === 'notifications' ? 'Notifications' : panel === 'profile' ? 'Your profile' : panel === 'settings' ? 'Workspace settings' : 'Quick actions'}</h2></div><Button variant="ghost" size="icon" onClick={() => setPanel(null)} aria-label="Close panel"><X /></Button></div>
         {panel === 'notifications' && <div className="mt-6 flex flex-col gap-3"><div className="rounded-xl bg-muted/60 p-4"><p className="text-sm font-bold">All systems are healthy</p><p className="mt-1 text-xs text-muted-foreground">No new service alerts.</p></div><div className="rounded-xl bg-accent/40 p-4"><p className="text-sm font-bold">Booking activity synced</p><p className="mt-1 text-xs text-muted-foreground">Your latest booking data is up to date.</p></div></div>}
-        {panel === 'profile' && <div className="mt-6 flex flex-col gap-4"><div className="flex items-center gap-3 rounded-xl bg-muted/60 p-4"><Avatar initials={initials(currentUser.full_name ?? 'Administrator')} tone="yellow" /><div><p className="font-bold">{currentUser.full_name ?? 'Administrator'}</p><p className="text-xs text-muted-foreground">{currentUser.email ?? 'No email available'}</p></div></div><Button variant="outline" className="w-full" onClick={() => showNotice('Profile editing is coming soon')}>Edit profile</Button></div>}
+        {panel === 'profile' && <div className="mt-6 flex flex-col gap-4"><div className="flex items-center gap-3 rounded-xl bg-muted/60 p-4"><Avatar initials={initials(savedProfileName || 'Administrator')} tone="yellow" /><div><p className="font-bold">{savedProfileName || 'Administrator'}</p><p className="text-xs text-muted-foreground">{currentUser.email ?? 'No email available'}</p></div></div>{isEditingProfile ? <div className="flex flex-col gap-4 rounded-xl border border-border p-4"><label className="flex flex-col gap-2 text-sm font-bold" htmlFor="profile-name">Full name<input id="profile-name" value={profileName} onChange={(event) => setProfileName(event.target.value)} disabled={isSavingProfile} className="h-10 rounded-lg border border-border bg-background px-3 text-sm font-normal outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/10 disabled:opacity-60" autoComplete="name" /></label><label className="flex flex-col gap-2 text-sm font-bold" htmlFor="profile-email">Email<input id="profile-email" value={currentUser.email ?? ''} disabled className="h-10 rounded-lg border border-border bg-muted px-3 text-sm font-normal text-muted-foreground" /></label><p className="text-xs leading-5 text-muted-foreground">Your email and administrator role are managed through your account.</p><div className="flex gap-2"><Button className="flex-1" onClick={saveProfile} disabled={isSavingProfile}>{isSavingProfile ? 'Saving…' : 'Save changes'}</Button><Button variant="outline" onClick={() => { setProfileName(savedProfileName); setIsEditingProfile(false) }} disabled={isSavingProfile}>Cancel</Button></div></div> : <Button variant="outline" className="w-full" onClick={() => setIsEditingProfile(true)}><UserRound data-icon="inline-start" />Edit profile</Button>}<Button variant="outline" className="w-full" onClick={signOut} disabled={isSigningOut}><LogOut data-icon="inline-start" />{isSigningOut ? 'Signing out…' : 'Log out'}</Button></div>}
         {panel === 'settings' && <div className="mt-6 flex flex-col gap-4"><div className="rounded-xl border border-border p-4"><p className="text-sm font-bold">Workspace preferences</p><p className="mt-1 text-xs text-muted-foreground">Manage notifications, calendar sync, and admin access.</p></div><Button className="w-full" onClick={() => showNotice('Workspace settings saved')}>Save settings</Button></div>}
         {panel === 'quick-actions' && <div className="mt-6 flex flex-col gap-2"><Button variant="outline" className="justify-start" onClick={() => { setPanel(null); setActiveTab(tabs[1]) }}><GraduationCap data-icon="inline-start" />Review students</Button><Button variant="outline" className="justify-start" onClick={() => { setPanel(null); setActiveTab(tabs[2]) }}><Users data-icon="inline-start" />Review teachers</Button><Button variant="outline" className="justify-start" onClick={() => { setPanel(null); setActiveTab(tabs[3]) }}><CalendarDays data-icon="inline-start" />Review bookings</Button><Button variant="outline" className="justify-start" onClick={() => { downloadReport(bookings); setPanel(null); showNotice('Report downloaded') }}><Download data-icon="inline-start" />Download report</Button></div>}
       </section></div>}
