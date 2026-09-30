@@ -1,26 +1,30 @@
-import { CheckCircle2 } from 'lucide-react'
+import { ArrowRight, CheckCircle2, ClipboardList, MessageCircle, TrendingUp, Video } from 'lucide-react'
 
 const journey = [
   {
-    step: '✦',
+    step: '1',
+    icon: MessageCircle,
     name: 'Tell us about your child',
     desc: 'Share their strengths, struggles, interests and goals. We listen before we teach.',
     tint: 'bg-accent text-accent-foreground',
   },
   {
-    step: '◌',
+    step: '2',
+    icon: ClipboardList,
     name: 'Build your learning plan',
     desc: 'We match your child with a vetted maths coach tailored to their needs with their pace and lesson style.',
     tint: 'bg-primary text-foreground',
   },
   {
-    step: '♡',
+    step: '3',
+    icon: Video,
     name: 'Your first demo lecture is free',
     desc: 'Meet your teacher in a live, personalized session. No obligation.',
     tint: 'bg-mint text-mint-foreground',
   },
   {
-    step: '↗',
+    step: '4',
+    icon: TrendingUp,
     name: 'Learn, track, and grow',
     desc: 'Parents get clear feedback while children build skills, confidence and independence.',
     tint: 'bg-coral text-coral-foreground',
@@ -86,15 +90,23 @@ export function Approach() {
         </div>
 
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {journey.map((item) => (
-            <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-              <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg transition-transform group-hover:rotate-3 ${item.tint}`}>
-                {item.step}
+          <div aria-hidden="true" className="pointer-events-none absolute left-[12%] right-[12%] top-10 hidden border-t-2 border-dashed border-primary/30 lg:block" />
+          {journey.map((item, index) => {
+            const Icon = item.icon
+            return (
+              <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+                <div className="flex items-center justify-between">
+                  <div className={`relative z-10 flex size-16 items-center justify-center rounded-2xl shadow-lg transition-transform group-hover:scale-105 ${item.tint}`}>
+                    <Icon className="size-7" aria-hidden="true" />
+                  </div>
+                  <span className="font-display text-4xl font-extrabold text-primary/20">{item.step}</span>
+                </div>
+                <h3 className="font-display text-2xl font-extrabold leading-tight">{item.name}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
+                {index < journey.length - 1 && <ArrowRight className="absolute -right-5 top-8 z-20 hidden size-6 text-primary lg:block" aria-hidden="true" />}
               </div>
-              <h3 className="font-display text-2xl font-extrabold leading-tight">{item.name}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="overflow-hidden rounded-[2rem] bg-sky text-foreground shadow-xl shadow-primary/15 ring-1 ring-border">
