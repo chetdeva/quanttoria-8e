@@ -97,7 +97,9 @@ export function Testimonials() {
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
-    card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    if (carousel && card) {
+      carousel.scrollTo({ left: card.offsetLeft, behavior: 'smooth' })
+    }
     activeIndexRef.current = index
     setActiveIndex(index)
   }
