@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from 'react'
 import Image from 'next/image'
-import { LoaderCircle } from 'lucide-react'
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -18,6 +18,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -140,19 +142,29 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           {mode !== 'forgot' && (
             <label className="flex flex-col gap-1 text-sm font-bold">
               Password
-              <input required type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring" />
+              <span className="relative">
+                <input required type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-input bg-background px-4 py-3 pr-12 font-normal outline-none focus:ring-2 focus:ring-ring" />
+                <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  {showPassword ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
+                </button>
+              </span>
             </label>
           )}
 
           {isSignup && (
             <label className="flex flex-col gap-1 text-sm font-bold">
               Confirm password
-              <input required type="password" value={confirm} onChange={(event) => setConfirm(event.target.value)} className="rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring" />
+              <span className="relative">
+                <input required type={showConfirm ? 'text' : 'password'} value={confirm} onChange={(event) => setConfirm(event.target.value)} className="w-full rounded-xl border border-input bg-background px-4 py-3 pr-12 font-normal outline-none focus:ring-2 focus:ring-ring" />
+                <button type="button" onClick={() => setShowConfirm((visible) => !visible)} aria-label={showConfirm ? 'Hide confirmed password' : 'Show confirmed password'} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  {showConfirm ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
+                </button>
+              </span>
             </label>
           )}
 
           {mode === 'login' && <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline">Forgot password?</Link>}
-          <Button type="submit" disabled={loading} aria-busy={loading} className="mt-2 w-full rounded-full font-bold">
+          <Button type="submit" disabled={loading} aria-busy={loading} className="mt-2 min-h-12 w-full rounded-full px-6 text-base font-bold shadow-sm">
             {loading && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
             {loading ? 'Please wait…' : mode === 'login' ? 'Login' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create account' : 'Send reset link'}
           </Button>
