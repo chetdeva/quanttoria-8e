@@ -91,7 +91,7 @@ export function Testimonials() {
       if (paused) return
       const nextIndex = (activeIndex + 1) % reviews.length
       scrollToReview(nextIndex)
-    }, 5000)
+    }, 1000)
 
     carousel.addEventListener('mouseenter', pause)
     carousel.addEventListener('mouseleave', resume)
@@ -141,6 +141,17 @@ export function Testimonials() {
         </div>
 
         <div>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h3 className="font-display text-2xl font-extrabold text-foreground">Read our reviews on Trustpilot</h3>
+            <Button
+              variant="link"
+              className="h-auto rounded-full p-0 font-bold text-primary"
+              nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
+            >
+              View all
+              <ExternalLink className="size-4" aria-hidden="true" />
+            </Button>
+          </div>
           <div
             ref={carouselRef}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -168,16 +179,6 @@ export function Testimonials() {
                 </footer>
               </a>
             ))}
-          </div>
-          <div className="mt-6 flex justify-center">
-            <Button
-              variant="outline"
-              className="rounded-full border-2 font-bold"
-              nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
-            >
-              Read all reviews on Trustpilot
-              <ExternalLink className="size-4" aria-hidden="true" />
-            </Button>
           </div>
           <div className="mt-5 flex items-center justify-center gap-2" aria-label="Choose a testimonial">
             {reviews.map((review, index) => (
