@@ -91,7 +91,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   return (
     <main className="flex min-h-screen items-center justify-center bg-graph-paper px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-xl sm:p-8">
-        <Link href="/" aria-label="Quanttoria home" className="inline-flex">
+        <Link href="/" aria-label="Quanttoria home" className="mx-auto flex w-fit">
           <Logo variant="full" className="w-40 sm:w-48" />
         </Link>
         <h1 className="mt-8 font-display text-3xl font-extrabold">{title}</h1>
