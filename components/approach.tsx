@@ -93,7 +93,7 @@ export function Approach() {
           {journey.map((item) => {
             const Icon = item.icon
             return (
-              <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+              <div key={item.step} className={`motion-rise motion-rise-delay-${item.step} group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
                 <div className="flex items-center justify-between">
                   <div className={`relative z-10 flex size-16 items-center justify-center rounded-2xl shadow-lg transition-transform group-hover:scale-105 ${item.tint}`}>
                     <Icon className="size-7" aria-hidden="true" />

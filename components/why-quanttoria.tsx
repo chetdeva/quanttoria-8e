@@ -66,7 +66,7 @@ export function WhyQuanttoria() {
             {reasons.map((r, index) => (
               <li
                 key={r.title}
-                className="flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border transition-transform hover:-translate-y-1"
+                className={`motion-rise motion-rise-delay-${index + 1} flex flex-col gap-3 rounded-3xl bg-card p-5 shadow-sm ring-1 ring-border transition-transform duration-300 hover:-translate-y-1`}
               >
                 <div className="flex items-center justify-between">
                   <span className={`inline-flex size-12 items-center justify-center rounded-2xl ${r.color}`}>
