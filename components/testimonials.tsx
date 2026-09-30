@@ -89,7 +89,7 @@ export function Testimonials() {
 
     const timer = window.setInterval(() => {
       scrollToReview((activeIndexRef.current + 1) % reviews.length)
-    }, 1000)
+    }, 3000)
 
     return () => window.clearInterval(timer)
   }, [])
@@ -98,7 +98,7 @@ export function Testimonials() {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
     if (carousel && card) {
-      carousel.scrollTo({ left: card.offsetLeft, behavior: 'smooth' })
+      carousel.scrollTo({ left: Math.max(0, card.offsetLeft - 16), behavior: 'smooth' })
     }
     activeIndexRef.current = index
     setActiveIndex(index)
@@ -145,7 +145,7 @@ export function Testimonials() {
           </div>
           <div
             ref={carouselRef}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth px-6 py-4 sm:px-10 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             aria-label="Parent testimonials carousel"
           >
             {reviews.map((r, index) => (
@@ -155,7 +155,7 @@ export function Testimonials() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Open ${r.name}'s review in the Trustpilot search results`}
-                className="flex w-[min(82vw,22rem)] shrink-0 snap-start flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm ring-1 ring-border transition-transform hover:-translate-y-1 hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:w-[22rem]"
+                className="flex w-[min(82vw,22rem)] shrink-0 snap-start flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border transition-transform hover:-translate-y-1 hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:w-[22rem]"
               >
                 <Stars count={r.rating} />
                 <blockquote className="flex-1 text-pretty text-base leading-relaxed text-foreground">
