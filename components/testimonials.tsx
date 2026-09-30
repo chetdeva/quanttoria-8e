@@ -80,6 +80,32 @@ export function Testimonials() {
     return () => carousel.removeEventListener('scroll', updateActiveIndex)
   }, [])
 
+  useEffect(() => {
+    const carousel = carouselRef.current
+    if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let paused = false
+    const pause = () => { paused = true }
+    const resume = () => { paused = false }
+    const timer = window.setInterval(() => {
+      if (paused) return
+      const nextIndex = (activeIndex + 1) % reviews.length
+      scrollToReview(nextIndex)
+    }, 5000)
+
+    carousel.addEventListener('mouseenter', pause)
+    carousel.addEventListener('mouseleave', resume)
+    carousel.addEventListener('focusin', pause)
+    carousel.addEventListener('focusout', resume)
+    return () => {
+      window.clearInterval(timer)
+      carousel.removeEventListener('mouseenter', pause)
+      carousel.removeEventListener('mouseleave', resume)
+      carousel.removeEventListener('focusin', pause)
+      carousel.removeEventListener('focusout', resume)
+    }
+  }, [activeIndex])
+
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
@@ -99,14 +125,6 @@ export function Testimonials() {
               Progress feels better when families are part of the journey.
             </h2>
           </div>
-          <Button
-            variant="outline"
-            className="rounded-full border-2 font-bold"
-            nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
-          >
-            Read all reviews on Trustpilot
-            <ExternalLink className="size-4" aria-hidden="true" />
-          </Button>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -150,6 +168,16 @@ export function Testimonials() {
                 </footer>
               </a>
             ))}
+          </div>
+          <div className="mt-6 flex justify-center">
+            <Button
+              variant="outline"
+              className="rounded-full border-2 font-bold"
+              nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
+            >
+              Read all reviews on Trustpilot
+              <ExternalLink className="size-4" aria-hidden="true" />
+            </Button>
           </div>
           <div className="mt-5 flex items-center justify-center gap-2" aria-label="Choose a testimonial">
             {reviews.map((review, index) => (
