@@ -9,7 +9,9 @@ import { Button } from '@/components/ui/button'
 const redirectUrl = () =>
   process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`
 
-export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
+export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' | 'forgot' }) {
+  const isSignup = mode === 'signup' || mode === 'admin-signup'
+  const isAdminSignup = mode === 'admin-signup'
   const [role, setRole] = useState<'student' | 'teacher'>('student')
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
@@ -38,7 +40,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
         return
       }
 
-      if (mode === 'signup') {
+      if (isSignup) {
         if (password !== confirm) {
           setMessage('Passwords do not match.')
           return
@@ -53,7 +55,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
           password,
           options: {
             emailRedirectTo: redirectUrl(),
-            data: { full_name: fullName, role },
+            data: { full_name: fullName, role: isAdminSignup ? 'admin' : role },
           },
         })
         setMessage(
@@ -76,7 +78,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
   }
 
   const title =
-    mode === 'login' ? 'Welcome back' : mode === 'signup' ? 'Create your account' : 'Reset your password'
+    mode === 'login' ? 'Welcome back' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create your account' : 'Reset your password'
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-graph-paper px-4 py-12">
@@ -124,7 +126,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
             </label>
           )}
 
-          {mode === 'signup' && (
+          {isSignup && (
             <label className="flex flex-col gap-1 text-sm font-bold">
               Confirm password
               <input required type="password" value={confirm} onChange={(event) => setConfirm(event.target.value)} className="rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring" />
@@ -134,19 +136,22 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'forgot' }) {
           {mode === 'login' && <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline">Forgot password?</Link>}
           <Button type="submit" disabled={loading} aria-busy={loading} className="mt-2 w-full rounded-full font-bold">
             {loading && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
-            {loading ? 'Please wait…' : mode === 'login' ? 'Login' : mode === 'signup' ? 'Create account' : 'Send reset link'}
+            {loading ? 'Please wait…' : mode === 'login' ? 'Login' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create account' : 'Send reset link'}
           </Button>
           {loading && <p className="sr-only" role="status">Submitting, please wait.</p>}
           {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
         </form>
 
         {mode !== 'forgot' && (
-          <p className="mt-6 text-center text-sm text-muted-foreground">
-            {mode === 'login' ? 'New to Quanttoria?' : 'Already have an account?'}{' '}
-            <Link href={mode === 'login' ? '/signup' : '/login'} className="font-bold text-primary hover:underline">
-              {mode === 'login' ? 'Create account' : 'Login'}
-            </Link>
-          </p>
+          <div className="mt-6 flex flex-col gap-2 text-center text-sm text-muted-foreground">
+            <p>
+              {mode === 'login' ? 'New to Quanttoria?' : 'Already have an account?'}{' '}
+              <Link href={mode === 'login' ? '/signup' : '/login'} className="font-bold text-primary hover:underline">
+                {mode === 'login' ? 'Create account' : 'Login'}
+              </Link>
+            </p>
+            {mode === 'login' && <Link href="/admin-signup" className="text-xs font-semibold text-muted-foreground hover:text-primary hover:underline">Register as an admin</Link>}
+          </div>
         )}
       </div>
     </main>

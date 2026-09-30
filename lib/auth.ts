@@ -9,9 +9,11 @@ export async function getProfile() {
   return profile ? { user, profile } : null
 }
 
-export async function requireRole(role: 'teacher' | 'student') {
+export async function requireRole(role: 'teacher' | 'student' | 'admin') {
   const result = await getProfile()
   if (!result) redirect('/login')
-  if (result.profile.role !== role) redirect(result.profile.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard')
+  if (result.profile.role !== role) {
+    redirect(result.profile.role === 'admin' ? '/dashboard' : result.profile.role === 'teacher' ? '/teacher/dashboard' : '/student/dashboard')
+  }
   return result
 }
