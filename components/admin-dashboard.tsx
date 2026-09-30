@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import { useMemo, useState } from 'react'
 import {
   Activity,
@@ -25,7 +26,6 @@ import {
   Settings2,
   ShieldCheck,
   SlidersHorizontal,
-  Sparkles,
   UserRound,
   Users,
   X,
@@ -145,7 +145,7 @@ export default function AdminDashboard({ currentUser, profiles, sessions, bookin
     <div className="min-h-screen bg-[#f7f8fc] text-foreground">
       <aside className={`fixed inset-y-0 left-0 z-30 flex w-[248px] flex-col border-r border-border/70 bg-white transition-transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="flex h-[76px] items-center gap-3 border-b border-border/70 px-6">
-          <div className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground"><Sparkles className="size-4" /></div>
+          <Image src="/images/quanttoria-logo.png" alt="Quanttoria" width={861} height={678} className="h-10 w-14 object-contain" priority />
           <div><p className="font-display text-lg font-bold leading-none">Quanttoria</p><p className="mt-1 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Admin workspace</p></div>
         </div>
         <div className="px-4 py-6">

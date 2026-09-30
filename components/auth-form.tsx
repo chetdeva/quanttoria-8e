@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import Image from 'next/image'
 import { LoaderCircle } from 'lucide-react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -101,7 +102,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-5 bg-background/55 p-4 backdrop-blur-md" role="status" aria-live="polite" aria-label={mode === 'login' ? 'Signing you in' : mode === 'forgot' ? 'Sending your reset link' : 'Creating your account'}>
             <div className="relative grid size-20 place-items-center rounded-full bg-card shadow-xl">
               <div className="absolute inset-0 animate-spin rounded-full border-[5px] border-primary/20 border-t-primary motion-reduce:animate-pulse" aria-hidden="true" />
-              <span className="font-display text-sm font-extrabold text-primary">Q</span>
+              <Image src="/images/quanttoria-logo.png" alt="" width={861} height={678} className="size-10 object-contain" priority />
             </div>
             <p className="text-center text-sm font-bold text-foreground">{mode === 'login' ? 'Signing you in…' : mode === 'forgot' ? 'Sending your reset link…' : 'Creating your account…'}</p>
           </div>
