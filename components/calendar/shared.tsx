@@ -31,3 +31,44 @@ export function Stat({ label, value, tone }: { label: string; value: string; ton
     </div>
   )
 }
+
+export function EventCard({
+  accent,
+  title,
+  meta,
+  badge,
+  children,
+}: {
+  accent: 'primary' | 'mint' | 'coral' | 'muted'
+  title: string
+  meta: string
+  badge?: string
+  children?: React.ReactNode
+}) {
+  const accentClass = {
+    primary: 'bg-primary',
+    mint: 'bg-mint',
+    coral: 'bg-coral',
+    muted: 'bg-border',
+  }[accent]
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-secondary pl-4">
+      <span className={`absolute inset-y-0 left-0 w-1.5 ${accentClass}`} aria-hidden="true" />
+      <div className="p-4 pl-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="truncate font-bold">{title}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{meta}</p>
+          </div>
+          {badge && (
+            <span className="shrink-0 rounded-full bg-card px-2.5 py-1 text-xs font-bold uppercase tracking-wide text-mint-foreground">
+              {badge}
+            </span>
+          )}
+        </div>
+        {children}
+      </div>
+    </div>
+  )
+}

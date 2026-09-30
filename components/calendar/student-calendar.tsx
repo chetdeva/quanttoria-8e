@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { WeeklyCalendarGrid } from './weekly-calendar-grid'
 import { BookingDialog } from './booking-dialog'
-import { AdminViewBanner, Stat } from './shared'
+import { AdminViewBanner, EventCard, Stat } from './shared'
 import type { Booking, GridSession, Session } from './types'
 
 const STARTING_CREDITS = 8
@@ -134,22 +134,19 @@ export function StudentCalendar({
                 <p className="py-8 text-sm text-muted-foreground">Booked classes will appear here.</p>
               ) : (
                 bookings.map((booking) => (
-                  <div key={booking.id} className="rounded-2xl bg-secondary p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-bold">{booking.class_sessions?.title ?? 'Class'}</p>
-                        <p className="mt-1 text-sm text-muted-foreground">
-                          {booking.class_sessions ? `${formatDate(booking.class_sessions.starts_at)} · ${formatTime(booking.class_sessions.starts_at)}` : ''}
-                        </p>
-                      </div>
-                      <span className="text-xs font-bold uppercase text-mint-foreground">{booking.status}</span>
-                    </div>
+                  <EventCard
+                    key={booking.id}
+                    accent={booking.status === 'confirmed' ? 'mint' : 'muted'}
+                    title={booking.class_sessions?.title ?? 'Class'}
+                    meta={booking.class_sessions ? `${formatDate(booking.class_sessions.starts_at)} · ${formatTime(booking.class_sessions.starts_at)}` : ''}
+                    badge={booking.status}
+                  >
                     {booking.status === 'confirmed' && (
                       <Button className="mt-3 w-full" variant="outline" size="sm" onClick={() => void cancel(booking)}>
                         Cancel class
                       </Button>
                     )}
-                  </div>
+                  </EventCard>
                 ))
               )}
             </div>

@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { AdminViewBanner, Panel } from './shared'
+import { AdminViewBanner, EventCard, Panel } from './shared'
 import type { Availability, Session } from './types'
 
 const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -171,22 +171,19 @@ export function TeacherCalendar({
               <p className="py-8 text-sm text-muted-foreground">Classes you publish will appear here.</p>
             ) : (
               sessions.map((session) => (
-                <div key={session.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-secondary p-4">
-                  <div>
-                    <p className="font-bold">{session.title}</p>
-                    <p className="mt-1 text-sm text-muted-foreground">
-                      {formatDate(session.starts_at)} · {formatTime(session.starts_at)} – {formatTime(session.ends_at)}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase text-mint-foreground">{session.status}</span>
-                    {session.status === 'open' && (
-                      <Button variant="outline" size="sm" onClick={() => void updateStatus(session.id, 'cancelled')}>
-                        Cancel
-                      </Button>
-                    )}
-                  </div>
-                </div>
+                <EventCard
+                  key={session.id}
+                  accent={session.status === 'open' ? 'mint' : session.status === 'booked' ? 'primary' : 'muted'}
+                  title={session.title}
+                  meta={`${formatDate(session.starts_at)} · ${formatTime(session.starts_at)} – ${formatTime(session.ends_at)}`}
+                  badge={session.status}
+                >
+                  {session.status === 'open' && (
+                    <Button className="mt-3" variant="outline" size="sm" onClick={() => void updateStatus(session.id, 'cancelled')}>
+                      Cancel
+                    </Button>
+                  )}
+                </EventCard>
               ))
             )}
           </div>
