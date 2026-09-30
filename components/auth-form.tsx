@@ -195,17 +195,12 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
     }
   }
 
-  const title =
-    mode === 'login' ? 'Sign in' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create account' : 'Reset your password'
-
   return (
     <main className="flex min-h-screen items-center justify-center bg-graph-paper px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-xl sm:p-8">
         <Link href="/" aria-label="Quanttoria home" className="mx-auto flex w-fit">
           <Logo variant="full" className="w-40 sm:w-48" />
         </Link>
-        <h1 className="mt-8 font-display text-3xl font-extrabold">{title}</h1>
-
         {loading && (
           <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-5 bg-background/55 p-4 backdrop-blur-md" role="status" aria-live="polite" aria-label={mode === 'login' ? 'Signing you in' : mode === 'forgot' ? 'Sending your reset link' : 'Creating your account'}>
             <div className="relative grid size-20 place-items-center rounded-full bg-card shadow-xl">
@@ -302,15 +297,9 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           </>
         )}
 
-        {mode !== 'forgot' && (
-          <div className="mt-6 flex flex-col gap-2 text-center text-sm text-muted-foreground">
-            <p>
-              {mode === 'login' ? 'New to Quanttoria?' : 'Already have an account?'}{' '}
-              <Link href={mode === 'login' ? '/signup' : '/login'} className="font-bold text-primary hover:underline">
-                {mode === 'login' ? 'Create account' : 'Login'}
-              </Link>
-            </p>
-            {mode === 'login' && <Link href="/admin-signup" className="text-xs font-semibold text-muted-foreground hover:text-primary hover:underline">Register as an admin</Link>}
+        {mode === 'login' && (
+          <div className="mt-6 flex justify-center text-center text-sm text-muted-foreground">
+            <Link href="/admin-signup" className="text-xs font-semibold text-muted-foreground hover:text-primary hover:underline">Register as an admin</Link>
           </div>
         )}
       </div>
