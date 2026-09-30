@@ -60,6 +60,7 @@ function Stars({ count }: { count: number }) {
 
 export function Testimonials() {
   const carouselRef = useRef<HTMLDivElement>(null)
+  const activeIndexRef = useRef(0)
   const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
@@ -73,7 +74,9 @@ export function Testimonials() {
         const closestDistance = Math.abs((cards[closest] as HTMLElement).offsetLeft - carousel.scrollLeft)
         return currentDistance < closestDistance ? index : closest
       }, 0)
-      setActiveIndex(Math.min(closestIndex, reviews.length - 1))
+      const nextIndex = Math.min(closestIndex, reviews.length - 1)
+      activeIndexRef.current = nextIndex
+      setActiveIndex(nextIndex)
     }
 
     carousel.addEventListener('scroll', updateActiveIndex, { passive: true })
@@ -85,16 +88,17 @@ export function Testimonials() {
     if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const timer = window.setInterval(() => {
-      scrollToReview((activeIndex + 1) % reviews.length)
+      scrollToReview((activeIndexRef.current + 1) % reviews.length)
     }, 1000)
 
     return () => window.clearInterval(timer)
-  }, [activeIndex])
+  }, [])
 
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
     card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    activeIndexRef.current = index
     setActiveIndex(index)
   }
 
