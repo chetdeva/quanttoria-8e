@@ -141,11 +141,11 @@ export function Testimonials() {
         </div>
 
         <div>
-          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h3 className="font-display text-2xl font-extrabold text-foreground">Read our reviews on Trustpilot</h3>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <h3 className="font-display text-2xl font-extrabold text-primary">Read our reviews on Trustpilot</h3>
             <Button
               variant="link"
-              className="h-auto rounded-full p-0 font-bold text-primary"
+              className="h-auto rounded-full p-0 font-bold text-foreground underline-offset-4 hover:text-primary"
               nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
             >
               View all
