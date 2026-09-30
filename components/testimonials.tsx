@@ -80,32 +80,6 @@ export function Testimonials() {
     return () => carousel.removeEventListener('scroll', updateActiveIndex)
   }, [])
 
-  useEffect(() => {
-    const carousel = carouselRef.current
-    if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    let paused = false
-    const pause = () => { paused = true }
-    const resume = () => { paused = false }
-    const timer = window.setInterval(() => {
-      if (paused) return
-      const nextIndex = (activeIndex + 1) % reviews.length
-      scrollToReview(nextIndex)
-    }, 1000)
-
-    carousel.addEventListener('mouseenter', pause)
-    carousel.addEventListener('mouseleave', resume)
-    carousel.addEventListener('focusin', pause)
-    carousel.addEventListener('focusout', resume)
-    return () => {
-      window.clearInterval(timer)
-      carousel.removeEventListener('mouseenter', pause)
-      carousel.removeEventListener('mouseleave', resume)
-      carousel.removeEventListener('focusin', pause)
-      carousel.removeEventListener('focusout', resume)
-    }
-  }, [activeIndex])
-
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
