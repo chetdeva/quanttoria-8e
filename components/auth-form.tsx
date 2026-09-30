@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react'
 import { Logo } from '@/components/logo'
@@ -34,6 +34,20 @@ function GoogleIcon() {
 const redirectUrl = () =>
   process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`
 
+const OAUTH_POPUP_MESSAGE = 'quanttoria-oauth-callback'
+
+function openOAuthPopup(url: string) {
+  const width = 480
+  const height = 640
+  const left = window.screenX + Math.max(0, (window.outerWidth - width) / 2)
+  const top = window.screenY + Math.max(0, (window.outerHeight - height) / 2)
+  return window.open(
+    url,
+    'quanttoria-google-signin',
+    `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
+  )
+}
+
 export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' | 'forgot' }) {
   const isSignup = mode === 'signup' || mode === 'admin-signup'
   const isAdminSignup = mode === 'admin-signup'
@@ -47,20 +61,70 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const popupRef = useRef<Window | null>(null)
+
+  useEffect(() => {
+    // BroadcastChannel carries the result instead of window.opener.postMessage
+    // because Google's own sign-in pages send a Cross-Origin-Opener-Policy
+    // header that severs window.opener once the pop-up navigates there, even
+    // after it's redirected back to our origin.
+    if (typeof BroadcastChannel === 'undefined') return
+
+    const channel = new BroadcastChannel(OAUTH_POPUP_MESSAGE)
+    channel.onmessage = (event) => {
+      const success = Boolean((event.data as { success?: boolean } | undefined)?.success)
+
+      popupRef.current?.close()
+      popupRef.current = null
+
+      if (success) {
+        window.location.href = '/dashboard'
+      } else {
+        setGoogleLoading(false)
+        setMessage('We could not complete Google sign-in. Please try again.')
+      }
+    }
+
+    return () => channel.close()
+  }, [])
 
   async function signInWithGoogle() {
     setMessage('')
     setGoogleLoading(true)
     try {
       const supabase = createClient()
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: redirectUrl() },
+        options: { redirectTo: redirectUrl(), skipBrowserRedirect: true },
       })
-      if (error) {
+      if (error || !data?.url) {
         setMessage('We could not start Google sign-in. Please try again.')
         setGoogleLoading(false)
+        return
       }
+
+      // Tells /auth/callback this is the pop-up flow (rather than a normal
+      // email-link redirect), since window.opener can't be relied on once
+      // Google's pages are involved.
+      document.cookie = 'oauth_popup=1; path=/; max-age=120; SameSite=Lax'
+
+      const popup = openOAuthPopup(data.url)
+      if (!popup) {
+        setMessage('Please allow pop-ups for this site to sign in with Google.')
+        setGoogleLoading(false)
+        return
+      }
+      popupRef.current = popup
+
+      const pollClosed = setInterval(() => {
+        if (popup.closed) {
+          clearInterval(pollClosed)
+          if (popupRef.current) {
+            popupRef.current = null
+            setGoogleLoading(false)
+          }
+        }
+      }, 500)
     } catch {
       setMessage('We could not start Google sign-in. Please try again.')
       setGoogleLoading(false)
