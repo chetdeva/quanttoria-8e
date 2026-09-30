@@ -39,10 +39,10 @@ export function SignOutButton() {
             onClick={(event) => event.stopPropagation()}
           >
             <h2 id="logout-dialog-title" className="font-display text-xl font-extrabold">
-              Are you sure you want to log out?
+              Log out
             </h2>
-            <p id="logout-dialog-description" className="sr-only">
-              Confirm whether you want to end your current session.
+            <p id="logout-dialog-description" className="mt-2 text-sm text-muted-foreground">
+              Are you sure you want to log out?
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <Button
