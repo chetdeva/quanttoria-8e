@@ -6,8 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
-const redirectUrl = () =>
-  process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`
+const redirectUrl = () => `${window.location.origin}/auth/callback`
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' | 'forgot' }) {
   const isSignup = mode === 'signup' || mode === 'admin-signup'
@@ -90,6 +89,15 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
         <p className="mt-2 text-muted-foreground">
           {mode === 'login' ? 'Your next breakthrough is waiting.' : 'A friendly space for curious minds.'}
         </p>
+
+        {loading && (
+          <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/10 p-4 backdrop-blur-[2px]" role="status" aria-live="polite">
+            <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 text-sm font-bold text-foreground shadow-xl">
+              <LoaderCircle className="size-5 animate-spin text-primary" aria-hidden="true" />
+              <span>{mode === 'login' ? 'Signing you in…' : mode === 'forgot' ? 'Sending your reset link…' : 'Creating your account…'}</span>
+            </div>
+          </div>
+        )}
 
         <form onSubmit={submit} className="mt-7 flex flex-col gap-4">
           {mode === 'signup' && (
