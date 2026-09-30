@@ -64,15 +64,20 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const popupRef = useRef<Window | null>(null)
 
   useEffect(() => {
-    function handleMessage(event: MessageEvent) {
-      if (event.origin !== window.location.origin) return
-      const data = event.data as { type?: string; success?: boolean } | undefined
-      if (data?.type !== OAUTH_POPUP_MESSAGE) return
+    // BroadcastChannel carries the result instead of window.opener.postMessage
+    // because Google's own sign-in pages send a Cross-Origin-Opener-Policy
+    // header that severs window.opener once the pop-up navigates there, even
+    // after it's redirected back to our origin.
+    if (typeof BroadcastChannel === 'undefined') return
+
+    const channel = new BroadcastChannel(OAUTH_POPUP_MESSAGE)
+    channel.onmessage = (event) => {
+      const success = Boolean((event.data as { success?: boolean } | undefined)?.success)
 
       popupRef.current?.close()
       popupRef.current = null
 
-      if (data.success) {
+      if (success) {
         window.location.href = '/dashboard'
       } else {
         setGoogleLoading(false)
@@ -80,8 +85,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
       }
     }
 
-    window.addEventListener('message', handleMessage)
-    return () => window.removeEventListener('message', handleMessage)
+    return () => channel.close()
   }, [])
 
   async function signInWithGoogle() {
@@ -98,6 +102,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
         setGoogleLoading(false)
         return
       }
+
+      // Tells /auth/callback this is the pop-up flow (rather than a normal
+      // email-link redirect), since window.opener can't be relied on once
+      // Google's pages are involved.
+      document.cookie = 'oauth_popup=1; path=/; max-age=120; SameSite=Lax'
 
       const popup = openOAuthPopup(data.url)
       if (!popup) {
