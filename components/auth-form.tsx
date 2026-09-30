@@ -23,6 +23,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
     event.preventDefault()
     setMessage('')
     setLoading(true)
+    let navigationStarted = false
 
     try {
       const supabase = createClient()
@@ -49,7 +50,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           return
         }
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -57,11 +58,16 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
             data: { full_name: fullName, role: isAdminSignup ? 'admin' : role },
           },
         })
-        setMessage(
-          error
-            ? 'We could not create your account. Check your details and try again.'
-            : 'Account created. Check your inbox to confirm your email.',
-        )
+        if (error) {
+          setMessage('We could not create your account. Check your details and try again.')
+          return
+        }
+        if (data.session) {
+          navigationStarted = true
+          window.location.href = '/dashboard'
+          return
+        }
+        setMessage('Account created. Check your inbox to confirm your email.')
         return
       }
 
@@ -69,10 +75,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
       if (error) {
         setMessage('Invalid email or password.')
       } else {
+        navigationStarted = true
         window.location.href = '/dashboard'
       }
     } finally {
-      setLoading(false)
+      if (!navigationStarted) setLoading(false)
     }
   }
 
@@ -91,11 +98,12 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
         </p>
 
         {loading && (
-          <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/10 p-4 backdrop-blur-[2px]" role="status" aria-live="polite">
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 text-sm font-bold text-foreground shadow-xl">
-              <LoaderCircle className="size-5 animate-spin text-primary" aria-hidden="true" />
-              <span>{mode === 'login' ? 'Signing you in…' : mode === 'forgot' ? 'Sending your reset link…' : 'Creating your account…'}</span>
+          <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-5 bg-background/55 p-4 backdrop-blur-md" role="status" aria-live="polite" aria-label={mode === 'login' ? 'Signing you in' : mode === 'forgot' ? 'Sending your reset link' : 'Creating your account'}>
+            <div className="relative grid size-20 place-items-center rounded-full bg-card shadow-xl">
+              <div className="absolute inset-0 animate-spin rounded-full border-[5px] border-primary/20 border-t-primary motion-reduce:animate-pulse" aria-hidden="true" />
+              <span className="font-display text-sm font-extrabold text-primary">Q</span>
             </div>
+            <p className="text-center text-sm font-bold text-foreground">{mode === 'login' ? 'Signing you in…' : mode === 'forgot' ? 'Sending your reset link…' : 'Creating your account…'}</p>
           </div>
         )}
 
