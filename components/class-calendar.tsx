@@ -4,6 +4,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { CalendarDays, Check, Clock3, Plus, RefreshCw, Users, X } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+import { WeeklyCalendarGrid, type GridSession } from '@/components/weekly-calendar'
+
+const STARTING_CREDITS = 8
 
 type Session = { id: string; teacher_id: string; title: string; starts_at: string; ends_at: string; status: string; topic: string | null; notes: string | null }
 type Booking = { id: string; session_id: string; status: string; topic: string | null; notes: string | null; class_sessions?: Session }
@@ -25,6 +28,9 @@ export function StudentCalendar({ profileName, profileId, isAdminView = false }:
   const [loading, setLoading] = useState(true)
   const [message, setMessage] = useState('')
   const [timezone, setTimezone] = useState('UTC')
+  const [calendarTimezone, setCalendarTimezone] = useState('auto')
+  const [credits, setCredits] = useState(STARTING_CREDITS)
+  const [creditPulse, setCreditPulse] = useState(false)
   const supabase = useMemo(() => createClient(), [])
 
   async function load() {
@@ -43,9 +49,21 @@ export function StudentCalendar({ profileName, profileId, isAdminView = false }:
   async function book() {
     if (!selected) return
     setMessage('')
-    const { error } = await supabase.from('class_bookings').insert({ session_id: selected.id, student_id: profileId, topic: topic.trim() || null })
-    if (error) setMessage(error.code === '23505' ? 'That slot was just booked. Choose another time.' : 'We could not book that class. Please try again.')
-    else { setMessage('Class booked. Your tutor is ready for you.'); setSelected(null); setTopic(''); await load() }
+    const bookedSession = selected
+    const { error } = await supabase.from('class_bookings').insert({ session_id: bookedSession.id, student_id: profileId, topic: topic.trim() || null })
+    if (error) {
+      setMessage(error.code === '23505' ? 'That slot was just booked. Choose another time.' : 'We could not book that class. Please try again.')
+    } else {
+      setMessage('Class booked. Your tutor is ready for you.')
+      setSelected(null)
+      setTopic('')
+      setSessions((prev) => prev.filter((s) => s.id !== bookedSession.id))
+      setBookings((prev) => [{ id: `optimistic-${bookedSession.id}`, session_id: bookedSession.id, status: 'confirmed', topic: null, notes: null, class_sessions: bookedSession }, ...prev])
+      setCredits((prev) => Math.max(prev - 1, 0))
+      setCreditPulse(true)
+      setTimeout(() => setCreditPulse(false), 500)
+      await load()
+    }
   }
 
   async function cancel(booking: Booking) {
@@ -56,9 +74,26 @@ export function StudentCalendar({ profileName, profileId, isAdminView = false }:
   return <main className="min-h-screen bg-sky px-4 py-8 sm:px-8"><div className="mx-auto max-w-6xl">
     {isAdminView && <AdminViewBanner role="student" profileName={profileName} />}
     <header className="flex flex-wrap items-center justify-between gap-4"><div><p className="text-sm font-bold uppercase tracking-[0.2em] text-primary">Student space</p><h1 className="mt-2 font-display text-4xl font-extrabold">Your learning calendar, {profileName.split(' ')[0]}</h1><p className="mt-2 text-muted-foreground">Pick a time that works for you and make it count.</p></div><Button variant="outline" onClick={() => void load()}><RefreshCw data-icon="inline-start" />Refresh</Button></header>
-    <div className="mt-8 grid gap-5 md:grid-cols-3"><Stat label="Class credits" value="8" tone="bg-accent" /><Stat label="Upcoming classes" value={String(bookings.filter((b) => b.status === 'confirmed').length)} tone="bg-mint" /><Stat label="Your timezone" value={timezone} tone="bg-card" /></div>
-    <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"><div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-2xl font-extrabold">Open class times</h2><p className="text-sm text-muted-foreground">All times are shown in your local timezone.</p></div><CalendarDays className="text-primary" /></div>{loading ? <p className="py-12 text-center text-muted-foreground">Loading available classes...</p> : sessions.length === 0 ? <div className="py-12 text-center"><CalendarDays className="mx-auto text-muted-foreground" /><p className="mt-3 font-bold">No open times yet</p><p className="mt-1 text-sm text-muted-foreground">Your teacher will publish the next available class here.</p></div> : <div className="mt-5 grid gap-3">{sessions.map((session) => <button key={session.id} type="button" onClick={() => setSelected(session)} className="flex items-center justify-between rounded-2xl border border-border p-4 text-left transition hover:border-primary hover:bg-secondary"><span><span className="block font-bold">{formatDate(session.starts_at)}</span><span className="mt-1 flex items-center gap-2 text-sm text-muted-foreground"><Clock3 className="size-4" />{formatTime(session.starts_at)} – {formatTime(session.ends_at)} · {session.title}</span></span><span className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-mint-foreground">Book</span></button>)}</div>}</div>
-      <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-2xl font-extrabold">Your classes</h2><p className="text-sm text-muted-foreground">Keep your momentum going.</p></div><Users className="text-coral" /></div><div className="mt-5 flex flex-col gap-3">{bookings.length === 0 ? <p className="py-8 text-sm text-muted-foreground">Booked classes will appear here.</p> : bookings.map((booking) => <div key={booking.id} className="rounded-2xl bg-secondary p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-bold">{booking.class_sessions?.title ?? 'Class'}</p><p className="mt-1 text-sm text-muted-foreground">{booking.class_sessions ? `${formatDate(booking.class_sessions.starts_at)} · ${formatTime(booking.class_sessions.starts_at)}` : ''}</p></div><span className="text-xs font-bold uppercase text-mint-foreground">{booking.status}</span></div>{booking.status === 'confirmed' && <Button className="mt-3 w-full" variant="outline" size="sm" onClick={() => void cancel(booking)}>Cancel class</Button>}</div>)}</div></div></section>
+    <div className="mt-8 grid gap-5 md:grid-cols-3">
+      <div className={`rounded-3xl border border-border bg-accent p-5 ${creditPulse ? 'animate-credit-pulse' : ''}`}>
+        <p className="text-sm font-bold text-muted-foreground">Class credits</p>
+        <p className="mt-2 font-display text-3xl font-extrabold">{credits}</p>
+      </div>
+      <Stat label="Upcoming classes" value={String(bookings.filter((b) => b.status === 'confirmed').length)} tone="bg-mint" />
+      <Stat label="Your timezone" value={timezone} tone="bg-card" />
+    </div>
+    <section className="mt-8 grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
+      <WeeklyCalendarGrid
+        availableSessions={sessions}
+        bookedSessions={bookings.filter((b) => b.status === 'confirmed' && b.class_sessions).map((b) => b.class_sessions as GridSession)}
+        onSelectSlot={(session) => setSelected(sessions.find((s) => s.id === session.id) ?? null)}
+        timezone={calendarTimezone}
+        onTimezoneChange={setCalendarTimezone}
+      />
+      <div className="rounded-3xl border border-border bg-card p-5 shadow-sm sm:p-7"><div className="flex items-center justify-between"><div><h2 className="font-display text-2xl font-extrabold">Your classes</h2><p className="text-sm text-muted-foreground">Keep your momentum going.</p></div><Users className="text-coral" /></div><div className="mt-5 flex flex-col gap-3">{bookings.length === 0 ? <p className="py-8 text-sm text-muted-foreground">Booked classes will appear here.</p> : bookings.map((booking) => <div key={booking.id} className="rounded-2xl bg-secondary p-4"><div className="flex items-start justify-between gap-3"><div><p className="font-bold">{booking.class_sessions?.title ?? 'Class'}</p><p className="mt-1 text-sm text-muted-foreground">{booking.class_sessions ? `${formatDate(booking.class_sessions.starts_at)} · ${formatTime(booking.class_sessions.starts_at)}` : ''}</p></div><span className="text-xs font-bold uppercase text-mint-foreground">{booking.status}</span></div>{booking.status === 'confirmed' && <Button className="mt-3 w-full" variant="outline" size="sm" onClick={() => void cancel(booking)}>Cancel class</Button>}</div>)}</div></div>
+    </section>
+    {loading && <p className="mt-4 text-center text-muted-foreground">Loading available classes...</p>}
+    {!loading && sessions.length === 0 && <p className="mt-4 text-center text-sm text-muted-foreground">No open times right now. Your teacher will publish the next available class here.</p>}
     {message && <p role="status" className="mt-5 rounded-xl bg-mint p-3 text-sm font-bold text-mint-foreground">{message}</p>}
     {selected && <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/30 p-4" role="dialog" aria-modal="true"><div className="w-full max-w-md rounded-3xl bg-card p-6 shadow-xl"><div className="flex items-center justify-between"><h2 className="font-display text-2xl font-extrabold">Confirm your class</h2><button type="button" aria-label="Close" onClick={() => setSelected(null)}><X /></button></div><p className="mt-4 rounded-2xl bg-secondary p-4 font-bold">{formatDate(selected.starts_at)} · {formatTime(selected.starts_at)} – {formatTime(selected.ends_at)}<span className="mt-1 block text-sm font-normal text-muted-foreground">{selected.title}</span></p><label className="mt-5 block text-sm font-bold" htmlFor="topic">What would you like to work on?</label><textarea id="topic" value={topic} onChange={(event) => setTopic(event.target.value)} rows={3} className="mt-2 w-full resize-none rounded-xl border border-input bg-background p-3 text-sm outline-none focus:ring-2 focus:ring-ring" placeholder="Optional topic or note" /><Button className="mt-5 w-full" onClick={() => void book()}><Check data-icon="inline-start" />Confirm booking</Button></div></div>}
   </div></main>
