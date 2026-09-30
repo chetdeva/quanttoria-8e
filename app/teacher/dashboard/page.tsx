@@ -1,6 +1,6 @@
 import { requireRoleOrAdminView } from '@/lib/auth'
 import { SignOutButton } from '@/components/sign-out-button'
-import { TeacherCalendar } from '@/components/class-calendar'
+import { TeacherCalendar } from '@/components/calendar'
 
 export default async function TeacherDashboard({ searchParams }: { searchParams: Promise<{ userId?: string }> }) {
   const { userId } = await searchParams

@@ -2,52 +2,20 @@
 
 import { useMemo } from 'react'
 import { Check, Globe } from 'lucide-react'
-
-export type GridSession = { id: string; title: string; starts_at: string; ends_at: string }
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import { TIMEZONE_OPTIONS, hourLabel, zonedParts } from './timezone'
+import type { GridSession } from './types'
 
 const HOUR_HEIGHT = 64
 const START_HOUR = 8
 const END_HOUR = 20
 const HOURS = Array.from({ length: END_HOUR - START_HOUR + 1 }, (_, i) => START_HOUR + i)
-
-export const TIMEZONE_OPTIONS = [
-  { value: 'auto', label: 'Local time (detected)' },
-  { value: 'America/New_York', label: 'Eastern Time' },
-  { value: 'America/Chicago', label: 'Central Time' },
-  { value: 'America/Denver', label: 'Mountain Time' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time' },
-  { value: 'America/Anchorage', label: 'Alaska Time' },
-  { value: 'Pacific/Honolulu', label: 'Hawaii Time' },
-]
-
-function zonedParts(date: Date, timeZone: string) {
-  const fmt = new Intl.DateTimeFormat('en-US', {
-    timeZone,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-    weekday: 'short',
-  })
-  const map: Record<string, string> = {}
-  for (const part of fmt.formatToParts(date)) map[part.type] = part.value
-  const hour = map.hour === '24' ? 0 : Number(map.hour)
-  return {
-    dateKey: `${map.year}-${map.month}-${map.day}`,
-    hour,
-    minute: Number(map.minute),
-    weekday: map.weekday,
-    monthDay: `${map.month}/${map.day}`,
-  }
-}
-
-function hourLabel(hour: number) {
-  const period = hour >= 12 ? 'PM' : 'AM'
-  const display = hour % 12 === 0 ? 12 : hour % 12
-  return `${display} ${period}`
-}
 
 type PlacedChip = {
   key: string
@@ -78,8 +46,7 @@ export function WeeklyCalendarGrid({
     const now = Date.now()
     return Array.from({ length: 7 }, (_, i) => {
       const instant = new Date(now + i * 86400000)
-      const parts = zonedParts(instant, effectiveZone)
-      return parts
+      return zonedParts(instant, effectiveZone)
     })
   }, [effectiveZone])
 
@@ -121,21 +88,20 @@ export function WeeklyCalendarGrid({
           <h2 className="font-display text-2xl font-extrabold">Open class times</h2>
           <p className="text-sm text-muted-foreground">Tap a green slot to book your class.</p>
         </div>
-        <label className="flex items-center gap-2 rounded-xl border border-input bg-background px-3 py-2 text-sm font-bold">
-          <Globe className="size-4 text-primary" aria-hidden="true" />
-          <span className="sr-only">Timezone</span>
-          <select
-            value={timezone}
-            onChange={(event) => onTimezoneChange(event.target.value)}
-            className="bg-transparent outline-none"
-          >
+        <Select value={timezone} onValueChange={(value) => value && onTimezoneChange(value)}>
+          <SelectTrigger className="w-auto gap-2 rounded-xl border-input bg-background text-sm font-bold">
+            <Globe className="size-4 text-primary" aria-hidden="true" />
+            <span className="sr-only">Timezone</span>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
             {TIMEZONE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
+              <SelectItem key={option.value} value={option.value}>
                 {option.label}
-              </option>
+              </SelectItem>
             ))}
-          </select>
-        </label>
+          </SelectContent>
+        </Select>
       </div>
 
       <div className="mt-5 overflow-x-auto">
