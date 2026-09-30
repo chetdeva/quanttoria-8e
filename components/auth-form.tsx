@@ -196,7 +196,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   }
 
   const title =
-    mode === 'login' ? 'Welcome back' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create your account' : 'Reset your password'
+    mode === 'login' ? 'Sign in' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create account' : 'Reset your password'
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-graph-paper px-4 py-12">
@@ -205,9 +205,6 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           <Logo variant="full" className="w-40 sm:w-48" />
         </Link>
         <h1 className="mt-8 font-display text-3xl font-extrabold">{title}</h1>
-        <p className="mt-2 text-muted-foreground">
-          {mode === 'login' ? 'Your next breakthrough is waiting.' : 'A friendly space for curious minds.'}
-        </p>
 
         {loading && (
           <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-5 bg-background/55 p-4 backdrop-blur-md" role="status" aria-live="polite" aria-label={mode === 'login' ? 'Signing you in' : mode === 'forgot' ? 'Sending your reset link' : 'Creating your account'}>

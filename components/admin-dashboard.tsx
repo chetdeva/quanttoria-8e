@@ -138,7 +138,7 @@ export default function AdminDashboard({ currentUser, profiles, sessions, bookin
       setIsSigningOut(false)
       return showNotice('Could not log out')
     }
-    window.location.href = '/'
+    window.location.href = '/login'
   }
 
   return (
