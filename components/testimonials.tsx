@@ -80,6 +80,17 @@ export function Testimonials() {
     return () => carousel.removeEventListener('scroll', updateActiveIndex)
   }, [])
 
+  useEffect(() => {
+    const carousel = carouselRef.current
+    if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    const timer = window.setInterval(() => {
+      scrollToReview((activeIndex + 1) % reviews.length)
+    }, 1000)
+
+    return () => window.clearInterval(timer)
+  }, [activeIndex])
+
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
