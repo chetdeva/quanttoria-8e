@@ -24,6 +24,16 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
+## Dashboard calendars
+
+Both dashboards use the existing Supabase clients and tables. Set the Supabase variables from `.env.example` in `.env.local`; no Google Calendar account or calendar URL is required.
+
+- Teachers use FullCalendar's week, day, and month views. Drag a time range or use **Create class slot** to publish a class. Open future slots can be moved or resized; failed saves revert the change. Click a class to edit it, block/reopen it, or mark a confirmed class completed.
+- Choose **Repeat every week as working hours** to save a rule in `teacher_availability`. Rules in the browser's timezone appear as background bands. Rules saved in another timezone are listed with their original timezone. Weekly hours do not create bookable sessions; publish individual slots in `class_sessions`.
+- Students use a React DayPicker month calendar to choose a date, then select a published slot and confirm a booking through `class_bookings`. Booking and cancellation dialogs use React Aria for focus management and keyboard access.
+
+All dated sessions are stored as UTC timestamps and displayed in the browser's local timezone. Existing Supabase RLS policies and booking uniqueness constraints remain responsible for authorization and concurrent booking conflicts. This UI change does not alter the remote database schema or policies.
+
 ## Learn More
 
 To learn more, take a look at the following resources:
