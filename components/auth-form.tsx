@@ -1,7 +1,9 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
-import { LoaderCircle } from 'lucide-react'
+import Image from 'next/image'
+import { Eye, EyeOff, LoaderCircle } from 'lucide-react'
+import { Logo } from '@/components/logo'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -16,6 +18,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -23,6 +27,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
     event.preventDefault()
     setMessage('')
     setLoading(true)
+    let navigationStarted = false
 
     try {
       const supabase = createClient()
@@ -49,7 +54,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           return
         }
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -57,11 +62,16 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
             data: { full_name: fullName, role: isAdminSignup ? 'admin' : role },
           },
         })
-        setMessage(
-          error
-            ? 'We could not create your account. Check your details and try again.'
-            : 'Account created. Check your inbox to confirm your email.',
-        )
+        if (error) {
+          setMessage('We could not create your account. Check your details and try again.')
+          return
+        }
+        if (data.session) {
+          navigationStarted = true
+          window.location.href = '/dashboard'
+          return
+        }
+        setMessage('Account created. Check your inbox to confirm your email.')
         return
       }
 
@@ -69,10 +79,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
       if (error) {
         setMessage('Invalid email or password.')
       } else {
+        navigationStarted = true
         window.location.href = '/dashboard'
       }
     } finally {
-      setLoading(false)
+      if (!navigationStarted) setLoading(false)
     }
   }
 
@@ -82,8 +93,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   return (
     <main className="flex min-h-screen items-center justify-center bg-graph-paper px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-xl sm:p-8">
-        <Link href="/" className="font-display text-2xl font-extrabold text-primary">
-          Quanttoria
+        <Link href="/" aria-label="Quanttoria home" className="mx-auto flex w-fit">
+          <Logo variant="full" className="w-40 sm:w-48" />
         </Link>
         <h1 className="mt-8 font-display text-3xl font-extrabold">{title}</h1>
         <p className="mt-2 text-muted-foreground">
@@ -91,11 +102,12 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
         </p>
 
         {loading && (
-          <div className="fixed inset-0 z-50 grid place-items-center bg-foreground/10 p-4 backdrop-blur-[2px]" role="status" aria-live="polite">
-            <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-5 py-4 text-sm font-bold text-foreground shadow-xl">
-              <LoaderCircle className="size-5 animate-spin text-primary" aria-hidden="true" />
-              <span>{mode === 'login' ? 'Signing you in…' : mode === 'forgot' ? 'Sending your reset link…' : 'Creating your account…'}</span>
+          <div className="fixed inset-0 z-[110] flex flex-col items-center justify-center gap-5 bg-background/55 p-4 backdrop-blur-md" role="status" aria-live="polite" aria-label={mode === 'login' ? 'Signing you in' : mode === 'forgot' ? 'Sending your reset link' : 'Creating your account'}>
+            <div className="relative grid size-20 place-items-center rounded-full bg-card shadow-xl">
+              <div className="absolute inset-0 animate-spin rounded-full border-[5px] border-primary/20 border-t-primary motion-reduce:animate-pulse" aria-hidden="true" />
+              <Image src="/images/quanttoria-logo.png" alt="" width={861} height={678} className="size-10 object-contain" priority />
             </div>
+            <p className="text-center text-sm font-bold text-foreground">{mode === 'login' ? 'Signing you in…' : mode === 'forgot' ? 'Sending your reset link…' : 'Creating your account…'}</p>
           </div>
         )}
 
@@ -130,19 +142,29 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           {mode !== 'forgot' && (
             <label className="flex flex-col gap-1 text-sm font-bold">
               Password
-              <input required type="password" value={password} onChange={(event) => setPassword(event.target.value)} className="rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring" />
+              <span className="relative">
+                <input required type={showPassword ? 'text' : 'password'} value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-input bg-background px-4 py-3 pr-12 font-normal outline-none focus:ring-2 focus:ring-ring" />
+                <button type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? 'Hide password' : 'Show password'} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  {showPassword ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
+                </button>
+              </span>
             </label>
           )}
 
           {isSignup && (
             <label className="flex flex-col gap-1 text-sm font-bold">
               Confirm password
-              <input required type="password" value={confirm} onChange={(event) => setConfirm(event.target.value)} className="rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring" />
+              <span className="relative">
+                <input required type={showConfirm ? 'text' : 'password'} value={confirm} onChange={(event) => setConfirm(event.target.value)} className="w-full rounded-xl border border-input bg-background px-4 py-3 pr-12 font-normal outline-none focus:ring-2 focus:ring-ring" />
+                <button type="button" onClick={() => setShowConfirm((visible) => !visible)} aria-label={showConfirm ? 'Hide confirmed password' : 'Show confirmed password'} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                  {showConfirm ? <EyeOff className="size-5" aria-hidden="true" /> : <Eye className="size-5" aria-hidden="true" />}
+                </button>
+              </span>
             </label>
           )}
 
           {mode === 'login' && <Link href="/forgot-password" className="text-sm font-semibold text-primary hover:underline">Forgot password?</Link>}
-          <Button type="submit" disabled={loading} aria-busy={loading} className="mt-2 w-full rounded-full font-bold">
+          <Button type="submit" disabled={loading} aria-busy={loading} className="mt-2 min-h-12 w-full rounded-full px-6 text-base font-bold shadow-sm">
             {loading && <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />}
             {loading ? 'Please wait…' : mode === 'login' ? 'Login' : isAdminSignup ? 'Create admin account' : mode === 'signup' ? 'Create account' : 'Send reset link'}
           </Button>
