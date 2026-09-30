@@ -3,6 +3,7 @@
 import { FormEvent, useState } from 'react'
 import Image from 'next/image'
 import { LoaderCircle } from 'lucide-react'
+import { Logo } from '@/components/logo'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -90,8 +91,8 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   return (
     <main className="flex min-h-screen items-center justify-center bg-graph-paper px-4 py-12">
       <div className="w-full max-w-md rounded-3xl border border-border bg-card p-6 shadow-xl sm:p-8">
-        <Link href="/" className="font-display text-2xl font-extrabold text-primary">
-          Quanttoria
+        <Link href="/" aria-label="Quanttoria home" className="inline-flex">
+          <Logo variant="full" className="w-40 sm:w-48" />
         </Link>
         <h1 className="mt-8 font-display text-3xl font-extrabold">{title}</h1>
         <p className="mt-2 text-muted-foreground">
