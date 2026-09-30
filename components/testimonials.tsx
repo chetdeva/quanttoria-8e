@@ -155,7 +155,7 @@ export function Testimonials() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={`Open ${r.name}'s review in the Trustpilot search results`}
-                className="flex w-[min(82vw,22rem)] shrink-0 snap-start flex-col gap-4 rounded-3xl bg-card p-6 shadow-sm ring-1 ring-border transition-transform hover:-translate-y-1 hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:w-[22rem]"
+                className="flex w-[min(82vw,22rem)] shrink-0 snap-start flex-col gap-4 rounded-3xl bg-card p-8 shadow-sm ring-1 ring-border transition-transform hover:-translate-y-1 hover:ring-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary sm:w-[22rem]"
               >
                 <Stars count={r.rating} />
                 <blockquote className="flex-1 text-pretty text-base leading-relaxed text-foreground">
