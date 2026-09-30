@@ -1,6 +1,7 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
+@import 'react-day-picker/style.css';
 
 @theme inline {
   --font-sans: var(--font-nunito), 'Nunito Fallback', ui-sans-serif, system-ui, sans-serif;
@@ -83,6 +84,42 @@
   --chart-5: oklch(0.24 0.06 265);
   --radius: 1rem;
 }
+
+/* Calendar libraries share the app's light-only palette. */
+.booking-date-picker {
+  --rdp-accent-color: var(--primary);
+  --rdp-accent-background-color: var(--secondary);
+  --rdp-day-height: 36px;
+  --rdp-day-width: 36px;
+  --rdp-day_button-height: 34px;
+  --rdp-day_button-width: 34px;
+  --rdp-selected-border: 2px solid var(--primary);
+  margin-inline: auto;
+  width: fit-content;
+  font-size: 0.875rem;
+}
+.booking-date-picker .rdp-selected .rdp-day_button { background: var(--primary); color: var(--primary-foreground); }
+.booking-date-picker .calendar-day-available { position: relative; }
+.booking-date-picker .calendar-day-available::after { content: ''; position: absolute; bottom: 0; left: calc(50% - 2px); width: 4px; height: 4px; border-radius: 50%; background: var(--primary); pointer-events: none; }
+.schedule-matrix {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: var(--card);
+  --fc-neutral-bg-color: var(--secondary);
+  --fc-today-bg-color: var(--secondary);
+  --fc-now-indicator-color: var(--coral);
+  --fc-highlight-color: var(--secondary);
+}
+.schedule-matrix .fc { font-family: var(--font-sans); font-size: 0.8rem; }
+.schedule-matrix .fc-col-header-cell { padding-block: 10px; font-weight: 700; }
+.schedule-matrix .fc-timegrid-slot { height: 30px; }
+.schedule-matrix .fc-timegrid-slot-label { color: var(--muted-foreground); font-size: 0.7rem; }
+.schedule-matrix .fc-event { border-radius: 6px; border: 0; box-shadow: none; }
+.schedule-matrix .fc-event:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.schedule-matrix .schedule-event-open { background: var(--primary); color: var(--primary-foreground); }
+.schedule-matrix .schedule-event-confirmed { background: var(--mint); color: var(--mint-foreground); }
+.schedule-matrix .schedule-event-blocked, .schedule-matrix .schedule-event-cancelled, .schedule-matrix .schedule-event-completed { background: var(--muted); color: var(--muted-foreground); border: 1px solid var(--border); }
+.schedule-matrix .schedule-event-cancelled { text-decoration: line-through; }
+.schedule-matrix .schedule-availability { background: var(--mint); opacity: 0.15; }
 
 @layer base {
   * {
