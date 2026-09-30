@@ -80,6 +80,32 @@ export function Testimonials() {
     return () => carousel.removeEventListener('scroll', updateActiveIndex)
   }, [])
 
+  useEffect(() => {
+    const carousel = carouselRef.current
+    if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
+    let paused = false
+    const pause = () => { paused = true }
+    const resume = () => { paused = false }
+    const timer = window.setInterval(() => {
+      if (paused) return
+      const nextIndex = (activeIndex + 1) % reviews.length
+      scrollToReview(nextIndex)
+    }, 1000)
+
+    carousel.addEventListener('mouseenter', pause)
+    carousel.addEventListener('mouseleave', resume)
+    carousel.addEventListener('focusin', pause)
+    carousel.addEventListener('focusout', resume)
+    return () => {
+      window.clearInterval(timer)
+      carousel.removeEventListener('mouseenter', pause)
+      carousel.removeEventListener('mouseleave', resume)
+      carousel.removeEventListener('focusin', pause)
+      carousel.removeEventListener('focusout', resume)
+    }
+  }, [activeIndex])
+
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
@@ -99,14 +125,6 @@ export function Testimonials() {
               Progress feels better when families are part of the journey.
             </h2>
           </div>
-          <Button
-            variant="outline"
-            className="rounded-full border-2 font-bold"
-            nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
-          >
-            Read all reviews on Trustpilot
-            <ExternalLink className="size-4" aria-hidden="true" />
-          </Button>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -123,6 +141,17 @@ export function Testimonials() {
         </div>
 
         <div>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <h3 className="font-display text-2xl font-extrabold text-primary">Clients rated us 5 stars on Trustpilot</h3>
+            <Button
+              variant="link"
+              className="h-auto rounded-full p-0 font-bold text-foreground underline-offset-4 hover:text-primary"
+              nativeButton={false} render={<a href={site.trustpilotUrl} target="_blank" rel="noopener noreferrer" />}
+            >
+              Read all reviews
+              <ExternalLink className="size-4" aria-hidden="true" />
+            </Button>
+          </div>
           <div
             ref={carouselRef}
             className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

@@ -5,24 +5,16 @@ import { site } from '@/lib/site'
 
 export function Hero() {
   return (
-    <section id="top" className="bg-graph-paper relative overflow-hidden">
+    <section id="top" className="bg-graph-paper relative overflow-hidden bg-background">
       <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:pb-24 lg:pt-20">
-        <div className="flex flex-col items-start gap-6">
+        <div className="motion-rise flex flex-col items-start gap-6">
           <span className="inline-flex items-center gap-2 rounded-full bg-accent px-4 py-1.5 text-sm font-bold text-accent-foreground">
             <Star className="size-4 fill-current" aria-hidden="true" />
             Personalized 1:1 learning, Grades 1 to 10
           </span>
 
           <h1 className="font-display text-balance text-6xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl lg:text-7xl">
-            Turn maths into{' '}
-            <span className="relative isolate inline-block">
-              confidence
-              <span
-                aria-hidden="true"
-                className="absolute bottom-1 left-0 -z-10 h-4 w-full rounded-full bg-accent/80"
-              />
-            </span>
-            .
+            Math no fear, when we&apos;re here.
           </h1>
 
           <p className="max-w-xl text-pretty text-lg leading-relaxed text-muted-foreground">
@@ -80,7 +72,7 @@ export function Hero() {
               width={800}
               height={800}
               priority
-              className="h-auto w-full object-cover"
+              className="motion-float h-auto w-full scale-x-[-1] object-cover"
             />
           </div>
 

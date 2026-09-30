@@ -1,29 +1,33 @@
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2, ClipboardList, MessageCircle, TrendingUp, Video } from 'lucide-react'
 
 const journey = [
   {
-    step: '✦',
+    step: '1',
+    icon: MessageCircle,
     name: 'Tell us about your child',
     desc: 'Share their strengths, struggles, interests and goals. We listen before we teach.',
-    tint: 'bg-accent text-accent-foreground',
+    tint: 'bg-accent text-primary-foreground',
   },
   {
-    step: '◌',
+    step: '2',
+    icon: ClipboardList,
     name: 'Build your learning plan',
     desc: 'We match your child with a vetted maths coach tailored to their needs with their pace and lesson style.',
-    tint: 'bg-primary text-foreground',
+    tint: 'bg-primary text-primary-foreground',
   },
   {
-    step: '♡',
+    step: '3',
+    icon: Video,
     name: 'Your first demo lecture is free',
     desc: 'Meet your teacher in a live, personalized session. No obligation.',
-    tint: 'bg-mint text-mint-foreground',
+    tint: 'bg-mint text-primary-foreground',
   },
   {
-    step: '↗',
+    step: '4',
+    icon: TrendingUp,
     name: 'Learn, track, and grow',
     desc: 'Parents get clear feedback while children build skills, confidence and independence.',
-    tint: 'bg-coral text-coral-foreground',
+    tint: 'bg-coral text-primary-foreground',
   },
 ]
 
@@ -86,31 +90,37 @@ export function Approach() {
         </div>
 
         <div className="relative grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {journey.map((item) => (
-            <div key={item.step} className="group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-              <div className={`z-10 flex size-16 items-center justify-center rounded-2xl font-display text-2xl font-extrabold shadow-lg transition-transform group-hover:rotate-3 ${item.tint}`}>
-                {item.step}
+          {journey.map((item) => {
+            const Icon = item.icon
+            return (
+              <div key={item.step} className={`motion-rise motion-rise-delay-${item.step} group relative flex flex-col gap-3 rounded-3xl border border-border/70 bg-card p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg`}>
+                <div className="flex items-center justify-between">
+                  <div className={`relative z-10 flex size-16 items-center justify-center rounded-2xl shadow-lg transition-transform group-hover:scale-105 ${item.tint}`}>
+                    <Icon className="size-7" aria-hidden="true" />
+                  </div>
+                  <span className="font-display text-4xl font-extrabold text-primary/20">{item.step}</span>
+                </div>
+                <h3 className="font-display text-2xl font-extrabold leading-tight">{item.name}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
               </div>
-              <h3 className="font-display text-2xl font-extrabold leading-tight">{item.name}</h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{item.desc}</p>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
-        <div className="overflow-hidden rounded-[2rem] bg-sky text-foreground shadow-xl shadow-primary/15 ring-1 ring-border">
+        <div className="overflow-hidden rounded-[2rem] bg-primary text-primary-foreground shadow-xl shadow-primary/25 ring-1 ring-primary/20">
           <div className="grid gap-8 p-8 lg:grid-cols-[0.85fr_1.15fr] lg:p-10">
             <div className="flex flex-col gap-4">
               <p className="text-sm font-bold uppercase tracking-widest text-accent">US learning support</p>
               <h3 className="font-display text-3xl font-extrabold tracking-tight sm:text-4xl">A plan that speaks your child&apos;s school language.</h3>
               <p className="text-base leading-relaxed opacity-90">From everyday classroom confidence to ambitious AP goals, we connect the dots between where your child is today and where they want to go next.</p>
               <div className="mt-2 grid grid-cols-2 gap-3 text-sm">
-                <div className="rounded-2xl bg-foreground/10 p-4 ring-1 ring-foreground/15"><p className="font-display text-2xl font-extrabold">1:1</p><p className="opacity-75">focused attention</p></div>
-                <div className="rounded-2xl bg-foreground/10 p-4 ring-1 ring-foreground/15"><p className="font-display text-2xl font-extrabold">US</p><p className="opacity-75">standards-aware</p></div>
+                <div className="rounded-2xl bg-primary-foreground/15 p-4 ring-1 ring-primary-foreground/25"><p className="font-display text-2xl font-extrabold">1:1</p><p className="opacity-75">focused attention</p></div>
+                <div className="rounded-2xl bg-primary-foreground/15 p-4 ring-1 ring-primary-foreground/25"><p className="font-display text-2xl font-extrabold">US</p><p className="opacity-75">standards-aware</p></div>
               </div>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {usBoards.map((board) => (
-                <div key={board.name} className="flex flex-col gap-2 rounded-2xl bg-foreground/10 p-5 ring-1 ring-foreground/15 transition-colors hover:bg-foreground/15">
+                <div key={board.name} className="flex flex-col gap-2 rounded-2xl bg-background p-5 text-foreground shadow-sm ring-1 ring-primary-foreground/20 transition-colors hover:bg-accent/20">
                   <span className="w-fit rounded-full bg-accent px-3 py-1 text-xs font-extrabold text-accent-foreground">{board.name}</span>
                   <p className="text-sm leading-relaxed opacity-85">{board.detail}</p>
                 </div>
