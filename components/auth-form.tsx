@@ -8,7 +8,31 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 
-const redirectUrl = () => `${window.location.origin}/auth/callback`
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-5" aria-hidden="true">
+      <path
+        fill="#4285F4"
+        d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.48a5.54 5.54 0 0 1-2.4 3.63v3.02h3.88c2.27-2.09 3.56-5.17 3.56-8.84Z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 24c3.24 0 5.96-1.07 7.96-2.9l-3.88-3.02c-1.08.72-2.45 1.15-4.08 1.15-3.14 0-5.8-2.12-6.75-4.96H1.23v3.11A11.99 11.99 0 0 0 12 24Z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.25 14.27a7.2 7.2 0 0 1 0-4.54V6.62H1.23a11.99 11.99 0 0 0 0 10.76l4.02-3.11Z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 4.77c1.76 0 3.34.61 4.58 1.79l3.44-3.44A11.87 11.87 0 0 0 12 0 11.99 11.99 0 0 0 1.23 6.62l4.02 3.11c.95-2.84 3.61-4.96 6.75-4.96Z"
+      />
+    </svg>
+  )
+}
+
+const redirectUrl = () =>
+  process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' | 'forgot' }) {
   const isSignup = mode === 'signup' || mode === 'admin-signup'
@@ -22,6 +46,26 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const [showConfirm, setShowConfirm] = useState(false)
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
+
+  async function signInWithGoogle() {
+    setMessage('')
+    setGoogleLoading(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: redirectUrl() },
+      })
+      if (error) {
+        setMessage('We could not start Google sign-in. Please try again.')
+        setGoogleLoading(false)
+      }
+    } catch {
+      setMessage('We could not start Google sign-in. Please try again.')
+      setGoogleLoading(false)
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -171,6 +215,31 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
           {loading && <p className="sr-only" role="status">Submitting, please wait.</p>}
           {message && <p role="status" className="text-sm text-muted-foreground">{message}</p>}
         </form>
+
+        {mode !== 'forgot' && (
+          <>
+            <div className="mt-6 flex items-center gap-3 text-xs font-bold uppercase text-muted-foreground" role="separator">
+              <span className="h-px flex-1 bg-border" aria-hidden="true" />
+              or
+              <span className="h-px flex-1 bg-border" aria-hidden="true" />
+            </div>
+
+            <button
+              type="button"
+              onClick={signInWithGoogle}
+              disabled={googleLoading || loading}
+              aria-busy={googleLoading}
+              className="mt-4 flex min-h-12 w-full items-center justify-center gap-3 rounded-full border border-input bg-card px-6 text-base font-bold text-foreground shadow-sm transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {googleLoading ? (
+                <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
+              ) : (
+                <GoogleIcon />
+              )}
+              {googleLoading ? 'Connecting…' : mode === 'login' ? 'Sign in with Google' : 'Sign up with Google'}
+            </button>
+          </>
+        )}
 
         {mode !== 'forgot' && (
           <div className="mt-6 flex flex-col gap-2 text-center text-sm text-muted-foreground">
