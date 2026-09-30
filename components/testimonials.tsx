@@ -60,6 +60,7 @@ function Stars({ count }: { count: number }) {
 
 export function Testimonials() {
   const carouselRef = useRef<HTMLDivElement>(null)
+  const activeIndexRef = useRef(0)
   const [activeIndex, setActiveIndex] = useState(0)
 
   useEffect(() => {
@@ -73,7 +74,9 @@ export function Testimonials() {
         const closestDistance = Math.abs((cards[closest] as HTMLElement).offsetLeft - carousel.scrollLeft)
         return currentDistance < closestDistance ? index : closest
       }, 0)
-      setActiveIndex(Math.min(closestIndex, reviews.length - 1))
+      const nextIndex = Math.min(closestIndex, reviews.length - 1)
+      activeIndexRef.current = nextIndex
+      setActiveIndex(nextIndex)
     }
 
     carousel.addEventListener('scroll', updateActiveIndex, { passive: true })
@@ -84,32 +87,20 @@ export function Testimonials() {
     const carousel = carouselRef.current
     if (!carousel || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    let paused = false
-    const pause = () => { paused = true }
-    const resume = () => { paused = false }
     const timer = window.setInterval(() => {
-      if (paused) return
-      const nextIndex = (activeIndex + 1) % reviews.length
-      scrollToReview(nextIndex)
-    }, 1000)
+      scrollToReview((activeIndexRef.current + 1) % reviews.length)
+    }, 3000)
 
-    carousel.addEventListener('mouseenter', pause)
-    carousel.addEventListener('mouseleave', resume)
-    carousel.addEventListener('focusin', pause)
-    carousel.addEventListener('focusout', resume)
-    return () => {
-      window.clearInterval(timer)
-      carousel.removeEventListener('mouseenter', pause)
-      carousel.removeEventListener('mouseleave', resume)
-      carousel.removeEventListener('focusin', pause)
-      carousel.removeEventListener('focusout', resume)
-    }
-  }, [activeIndex])
+    return () => window.clearInterval(timer)
+  }, [])
 
   function scrollToReview(index: number) {
     const carousel = carouselRef.current
     const card = carousel?.children[index] as HTMLElement | undefined
-    card?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' })
+    if (carousel && card) {
+      carousel.scrollTo({ left: Math.max(0, card.offsetLeft - 16), behavior: 'smooth' })
+    }
+    activeIndexRef.current = index
     setActiveIndex(index)
   }
 
@@ -154,7 +145,7 @@ export function Testimonials() {
           </div>
           <div
             ref={carouselRef}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth scroll-px-4 px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             aria-label="Parent testimonials carousel"
           >
             {reviews.map((r, index) => (
