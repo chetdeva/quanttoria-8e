@@ -145,7 +145,7 @@ export function Testimonials() {
           </div>
           <div
             ref={carouselRef}
-            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain scroll-smooth px-2 py-4 sm:px-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             aria-label="Parent testimonials carousel"
           >
             {reviews.map((r, index) => (
