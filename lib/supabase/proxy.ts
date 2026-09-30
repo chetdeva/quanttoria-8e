@@ -10,7 +10,7 @@ export async function updateSession(request: NextRequest) {
   )
   const { data: { user } } = await supabase.auth.getUser()
   const pathname = request.nextUrl.pathname
-  if (!user && (pathname.startsWith('/teacher') || pathname.startsWith('/student'))) return NextResponse.redirect(new URL('/login', request.url))
+  if (!user && (pathname === '/dashboard' || pathname.startsWith('/teacher') || pathname.startsWith('/student'))) return NextResponse.redirect(new URL('/login', request.url))
   if (user && ['/login', '/signup', '/forgot-password'].includes(pathname)) return NextResponse.redirect(new URL('/dashboard', request.url))
   return response
 }
