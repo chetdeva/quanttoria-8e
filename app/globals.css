@@ -101,6 +101,31 @@
 .booking-date-picker .rdp-selected .rdp-day_button { background: var(--primary); color: var(--primary-foreground); }
 .booking-date-picker .calendar-day-available { position: relative; }
 .booking-date-picker .calendar-day-available::after { content: ''; position: absolute; bottom: 0; left: calc(50% - 2px); width: 4px; height: 4px; border-radius: 50%; background: var(--primary); pointer-events: none; }
+
+/* Student booking only: let the month fill the panel, without changing the
+   compact date pickers used in the teacher sidebar or other forms. */
+.student-booking-date-picker {
+  --rdp-day-width: 100%;
+  --rdp-day-height: 100%;
+  --rdp-day_button-width: 100%;
+  --rdp-day_button-height: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0;
+}
+.student-booking-date-picker .rdp-months { flex: 1; width: 100%; max-width: none; }
+.student-booking-date-picker .rdp-month { display: grid; flex: 1; min-width: 0; grid-template-rows: 48px 1fr; }
+.student-booking-date-picker .rdp-month_grid { display: grid; grid-template-rows: auto 1fr; width: 100%; min-height: 22rem; }
+.student-booking-date-picker .rdp-weekdays,
+.student-booking-date-picker .rdp-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); }
+.student-booking-date-picker .rdp-weeks { display: grid; grid-template-rows: repeat(6, minmax(0, 1fr)); gap: 4px; }
+.student-booking-date-picker .rdp-day { display: flex; min-width: 0; padding: 3px; }
+.student-booking-date-picker .rdp-day_button { border-radius: var(--radius); font-size: 1rem; }
+.student-booking-date-picker .rdp-day_button:not(:disabled):hover { background: var(--secondary); }
+.student-booking-date-picker .rdp-selected .rdp-day_button:hover { background: var(--primary); }
+.student-booking-date-picker .rdp-weekday { padding-block: 12px; }
+
 .schedule-matrix {
   --fc-border-color: var(--border);
   --fc-page-bg-color: var(--card);

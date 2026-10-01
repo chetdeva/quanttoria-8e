@@ -1,0 +1,10 @@
+export type ClassType = 'trial' | 'regular'
+export type VideoProvider = 'zoom' | 'google_meet'
+export type Teacher = { teacher_id: string; display_name: string; subject: string; grade_range: string }
+export type Session = { id: string; teacher_id: string; title: string; starts_at: string; ends_at: string; status: string; topic: string | null; notes: string | null }
+export type Availability = { id: string; teacher_id: string; day_of_week: number; start_time: string; end_time: string; timezone: string; is_active: boolean }
+export type Booking = { id: string; session_id: string; status: string; topic: string | null; notes: string | null; class_type: ClassType; video_provider: VideoProvider; meeting_status: string; calendar_status: string; meeting_url: string | null; class_sessions: Session | null }
+export type Slot = { teacher_id: string; starts_at: string; ends_at: string }
+export type Snapshot = { teachers: Teacher[]; sessions: Session[]; availability: Availability[]; bookings: Booking[]; availableCredits?: number | null }
+export const sessionFields = 'id, teacher_id, title, starts_at, ends_at, status, topic, notes'
+export const bookingFields = `id, session_id, status, topic, notes, class_type, video_provider, meeting_status, calendar_status, meeting_url, class_sessions(${sessionFields})`

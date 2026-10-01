@@ -1,404 +1,155 @@
 'use client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CalendarDays, Check, Clock3 } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { CalendarDays, Clock3, Video } from 'lucide-react'
+import { StudentAgenda } from '@/components/student-agenda'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { CalendarDialog } from '@/components/ui/calendar-dialog'
-import {
-  CalendarShell,
-  dateKey,
-  formatDate,
-  formatTime,
-  sessionFields,
-  type Booking,
-  type CalendarProps,
-  type Session,
-} from '@/components/calendar-shared'
+import { CalendarShell, type CalendarProps } from '@/components/calendar-shared'
+import { calendarRequest, loadCalendar } from '@/lib/calendar/client'
+import { availableSlots, dateInZone, dayInZone, timeInZone } from '@/lib/calendar/time'
+import { requiredCredits, validDuration } from '@/lib/calendar/booking-rules'
+import type { Booking, ClassType, Slot, Snapshot, VideoProvider } from '@/lib/calendar/types'
+
+const empty: Snapshot = { teachers: [], sessions: [], availability: [], bookings: [] }
+const inputClass = 'w-full rounded-xl border border-input bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 
 export function StudentCalendar(props: CalendarProps) {
-  const { profileId } = props
-  const supabase = useMemo(() => createClient(), [])
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [bookings, setBookings] = useState<Booking[]>([])
+  const [data, setData] = useState<Snapshot>(empty)
+  const [teacherId, setTeacherId] = useState('')
+  const [classType, setClassType] = useState<ClassType>('regular')
+  const [duration, setDuration] = useState(60)
+  const [customDuration, setCustomDuration] = useState(false)
+  const [provider, setProvider] = useState<VideoProvider>('zoom')
   const [day, setDay] = useState<Date>()
   const [month, setMonth] = useState<Date>()
-  const [selected, setSelected] = useState<Session | null>(null)
+  const [selected, setSelected] = useState<Slot | null>(null)
+  const [confirming, setConfirming] = useState(false)
+  const [replacing, setReplacing] = useState<Booking | null>(null)
   const [cancelling, setCancelling] = useState<Booking | null>(null)
   const [topic, setTopic] = useState('')
-  const [timezone, setTimezone] = useState('')
+  const [timezone, setTimezone] = useState('America/New_York')
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [dialogError, setDialogError] = useState('')
+  const [focusBooking, setFocusBooking] = useState('')
+  const teacher = data.teachers.find(t => t.teacher_id === teacherId)
+  const date = day ? dayInZone(day, timezone) : ''
+  const creditsRequired = validDuration(duration) ? requiredCredits(duration) : null
+  const slots = useMemo(() => date ? availableSlots(data.sessions, data.availability, teacherId, date, timezone, duration) : [], [data.sessions, data.availability, teacherId, date, timezone, duration])
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [slots, classes] = await Promise.all([
-        supabase
-          .from('class_sessions')
-          .select(sessionFields)
-          .eq('status', 'open')
-          .gte('starts_at', new Date().toISOString())
-          .order('starts_at'),
-        supabase
-          .from('class_bookings')
-          .select(
-            `id, session_id, status, topic, notes, class_sessions(${sessionFields})`,
-          )
-          .eq('student_id', profileId)
-          .order('created_at', { ascending: false }),
-      ])
-      if (slots.error || classes.error) {
-        setMessage('Could not load the calendar. Please refresh to try again.')
-        return
-      }
-      const normalized = (classes.data ?? []).map((booking) => ({
-        ...booking,
-        class_sessions: Array.isArray(booking.class_sessions)
-          ? (booking.class_sessions[0] ?? null)
-          : booking.class_sessions,
-      })) as Booking[]
-      const bookedIds = new Set(
-        normalized
-          .filter((booking) => booking.status !== 'cancelled')
-          .map((booking) => booking.session_id),
-      )
-      const available = ((slots.data ?? []) as Session[]).filter(
-        (slot) => !bookedIds.has(slot.id),
-      )
-      setSessions(available)
-      setBookings(normalized)
-      setDay(
-        (current) => current ?? new Date(available[0]?.starts_at ?? Date.now()),
-      )
-      setMonth(
-        (current) => current ?? new Date(available[0]?.starts_at ?? Date.now()),
-      )
-    } catch {
-      setMessage('Could not connect to the calendar. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }, [profileId, supabase])
+      const snapshot = await loadCalendar(props.profileId)
+      setData(snapshot)
+      setTeacherId(current => current || snapshot.teachers[0]?.teacher_id || '')
+    } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not load the calendar.') }
+    finally { setLoading(false) }
+  }, [props.profileId])
   useEffect(() => {
-    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
+    setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York')
+    const today = new Date()
+    setDay(today); setMonth(today)
     void load()
   }, [load])
-  const slots = sessions.filter(
-    (session) => day && dateKey(session.starts_at) === dateKey(day),
-  )
-  const upcoming = bookings.filter(
-    (booking) =>
-      booking.status === 'confirmed' &&
-      booking.class_sessions &&
-      new Date(booking.class_sessions.starts_at) > new Date(),
-  )
+  useEffect(() => { setSelected(null) }, [teacherId, date, duration, timezone])
 
   async function book() {
     if (!selected || busy) return
-    setBusy(true)
-    setDialogError('')
+    setBusy(true); setDialogError('')
     try {
-      if (new Date(selected.starts_at) <= new Date()) {
-        setDialogError('This time has passed. Choose another slot.')
-        return
-      }
-      const { error } = await supabase.from('class_bookings').insert({
-        session_id: selected.id,
-        student_id: profileId,
-        topic: topic.trim() || null,
-      })
-      if (error) {
-        setDialogError(
-          error.code === '23505'
-            ? 'That time is no longer available. Choose another slot.'
-            : 'Could not book this class. Please try again.',
-        )
-        await load()
-        return
-      }
-      setSelected(null)
-      setTopic('')
-      setMessage('Your class is booked. You can find it under Your classes.')
+      const result = await calendarRequest<{ id: string }>(`/bookings?userId=${props.profileId}`, { method: 'POST', body: JSON.stringify({ teacherId, startsAt: selected.starts_at, duration, classType, provider, topic, replaceId: replacing?.id }) })
+      setFocusBooking(result.id); setConfirming(false); setReplacing(null); setSelected(null); setTopic('')
+      setMessage(replacing ? 'Class rescheduled. Your new time is confirmed.' : 'Your class is confirmed. See meeting and calendar details below.')
       await load()
-    } catch {
-      setDialogError('Could not connect. Please try again.')
-    } finally {
-      setBusy(false)
-    }
+    } catch (error) {
+      setDialogError(error instanceof Error ? error.message : 'Could not book this class.')
+      await load()
+    } finally { setBusy(false) }
   }
   async function cancel() {
     if (!cancelling || busy) return
-    setBusy(true)
-    setDialogError('')
+    setBusy(true); setDialogError('')
     try {
-      const { data, error } = await supabase
-        .from('class_bookings')
-        .update({ status: 'cancelled' })
-        .eq('id', cancelling.id)
-        .eq('student_id', profileId)
-        .select('id')
-      if (error || !data?.length) {
-        setDialogError('Could not cancel this class. Please try again.')
-        return
-      }
-      setCancelling(null)
-      setMessage('Your class has been cancelled.')
-      await load()
-    } catch {
-      setDialogError('Could not connect. Please try again.')
-    } finally {
-      setBusy(false)
-    }
+      await calendarRequest(`/bookings/${cancelling.id}?userId=${props.profileId}`, { method: 'DELETE' })
+      setCancelling(null); setMessage('Class cancelled. This time is available again.'); await load()
+    } catch (error) { setDialogError(error instanceof Error ? error.message : 'Could not cancel this class.') }
+    finally { setBusy(false) }
   }
-  return (
-    <CalendarShell
-      {...props}
-      role="student"
-      timezone={timezone}
-      loading={loading}
-      onRefresh={() => void load()}
-    >
-      <section
-        aria-labelledby="booking-heading"
-        className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
-      >
-        <div className="flex items-center justify-between border-b border-border p-5">
-          <h2 id="booking-heading" className="text-lg font-bold">
-            Book a class
-          </h2>
-          <span className="text-xs text-muted-foreground">
-            {sessions.length} available times
-          </span>
+  function reschedule(booking: Booking) {
+    const session = booking.class_sessions
+    if (!session) return
+    setReplacing(booking); setTeacherId(session.teacher_id); setClassType(booking.class_type)
+    const minutes = (Date.parse(session.ends_at) - Date.parse(session.starts_at))/60000
+    setDuration(minutes); setCustomDuration(minutes !== 30 && minutes !== 60)
+    setProvider(booking.video_provider); setTopic(booking.topic || ''); setSelected(null)
+    setMessage('Choose a new time. Your existing reservation stays confirmed until the new time is secured.')
+    document.getElementById('booking-page')?.scrollIntoView({ behavior: 'smooth' })
+  }
+
+  return <CalendarShell {...props} role="student" timezone={timezone} loading={loading} onRefresh={() => void load()}>
+    {message && <p role="status" className="mb-5 rounded-xl border border-primary/20 bg-card p-4 text-sm">{message}</p>}
+    <section id="booking-page" aria-label="Book a class" className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm lg:grid lg:grid-cols-[280px_1fr_260px]">
+      <aside className="border-b border-border p-6 lg:border-r lg:border-b-0">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">Teacher profile</p>
+        <label htmlFor="booking-teacher" className="sr-only">Choose your teacher</label>
+        <select id="booking-teacher" className={inputClass} value={teacherId} disabled={loading || !!replacing} onChange={event => setTeacherId(event.target.value)}>
+          {!data.teachers.length && <option value="">No published teachers yet</option>}
+          {data.teachers.map(t => <option key={t.teacher_id} value={t.teacher_id}>{t.display_name}</option>)}
+        </select>
+        <h2 className="mt-4 font-display text-2xl font-bold">{teacher?.display_name || 'Choose a teacher'}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{teacher ? `${teacher.subject} · ${teacher.grade_range}` : 'One-to-one maths coaching'}</p>
+        <fieldset className="mt-6"><legend className="mb-2 text-sm font-bold">Choose class</legend><div className="flex gap-2">{(['regular', 'trial'] as const).map(type => <Button key={type} size="sm" variant={classType === type ? 'default' : 'outline'} aria-pressed={classType === type} onClick={() => setClassType(type)}>{type === 'trial' ? 'Trial Class' : 'Regular Class'}</Button>)}</div></fieldset>
+        <fieldset className="mt-6"><legend className="mb-2 flex items-center gap-2 text-sm font-bold"><Clock3 className="size-4" />Duration</legend><div className="flex flex-wrap gap-3">{([30,60] as const).map(value => <label key={value} className="flex items-center gap-2 text-sm"><input type="radio" name="duration" value={value} checked={!customDuration && duration === value} onChange={() => {setCustomDuration(false);setDuration(value)}} className="accent-primary" />{value} min</label>)}<label className="flex items-center gap-2 text-sm"><input type="radio" name="duration" checked={customDuration} onChange={()=>setCustomDuration(true)} className="accent-primary" />Custom</label></div>{customDuration && <div className="mt-3"><label htmlFor="custom-duration" className="mb-2 block text-sm">Duration in minutes</label><input id="custom-duration" type="number" min={15} max={180} step={15} value={duration || ''} onChange={e=>setDuration(Number(e.target.value))} aria-describedby="duration-help" aria-invalid={!validDuration(duration)} className={inputClass} /><p id="duration-help" className="mt-1 text-xs text-muted-foreground">15–180 minutes, in 15-minute steps.</p></div>}</fieldset>
+        <dl className="mt-5 space-y-2 rounded-xl border border-border bg-background p-3 text-sm" aria-label="Class credits"><div className="flex justify-between gap-2"><dt>Available credits</dt><dd className="font-bold">{loading ? 'Loading…' : data.availableCredits == null ? 'Not configured' : data.availableCredits}</dd></div><div className="flex justify-between gap-2"><dt>Credits required</dt><dd className="font-bold">{creditsRequired ?? '—'}</dd></div></dl><p className="mt-1 text-xs text-muted-foreground">1 credit per hour, prorated. Applies to both class types.</p>
+        <label htmlFor="video-provider" className="mt-6 mb-2 flex items-center gap-2 text-sm font-bold"><Video className="size-4" />Video call</label>
+        <select id="video-provider" className={inputClass} value={provider} onChange={e => setProvider(e.target.value as VideoProvider)}><option value="zoom">Zoom</option><option value="google_meet">Google Meet</option></select>
+        <label htmlFor="booking-timezone" className="mt-6 mb-2 block text-sm font-bold">Timezone</label>
+        <select id="booking-timezone" className={inputClass} value={timezone} onChange={e => { setTimezone(e.target.value); setDay(undefined); setMonth(new Date()) }}>
+          {Array.from(new Set([timezone,'America/New_York','America/Chicago','America/Denver','America/Los_Angeles','Asia/Kolkata','UTC'])).map(zone => <option key={zone} value={zone}>{zone.replaceAll('_',' ')}</option>)}
+        </select>
+      </aside>
+      <div className="flex min-w-0 flex-col border-b border-border p-6 lg:border-r lg:border-b-0">
+        <h3 className="mb-4 flex items-center gap-2 font-display text-xl font-bold"><CalendarDays className="size-5 text-primary" />Choose date</h3>
+        <Calendar mode="single" fixedWeeks timeZone={timezone} selected={day} month={month} onMonthChange={setMonth} onSelect={setDay} weekStartsOn={1} modifiers={{ booked:date=>data.bookings.some(b=>b.status==='confirmed'&&b.class_sessions&&dayInZone(b.class_sessions.starts_at,timezone)===dayInZone(date,timezone)) }} modifiersClassNames={{ booked:'font-bold underline decoration-primary decoration-2 underline-offset-4' }} disabled={date => loading || !teacherId || dayInZone(date, timezone) < dayInZone(new Date(),timezone) || dayInZone(date,timezone) > dayInZone(new Date(Date.now()+89*86400000),timezone)} className="student-booking-date-picker w-full flex-1" />
+        <p className="mt-4 text-center text-xs text-muted-foreground">Times are displayed in {timezone}. Availability updates when you book.</p>
+        <p className="mt-1 text-center text-xs text-muted-foreground">Underlined dates have booked classes.</p>
+      </div>
+      <div className="flex min-h-0 flex-col p-6">
+        <h3 className="font-display text-xl font-bold">Available times</h3>
+        <p className="mt-2 mb-4 text-sm text-muted-foreground">{day ? dateInZone(day,timezone) : 'Choose a date'}</p>
+        <div className="relative min-h-0 flex-1">
+        <div className="grid max-h-80 content-start gap-2 overflow-y-auto sm:grid-cols-2 lg:absolute lg:inset-0 lg:max-h-none lg:grid-cols-1" role="group" aria-label="Available class times" tabIndex={0}>
+          {slots.map(slot => <Button key={slot.starts_at} variant={selected?.starts_at===slot.starts_at?'default':'outline'} aria-pressed={selected?.starts_at===slot.starts_at} className="h-11 rounded-xl" onClick={() => setSelected(slot)}>{timeInZone(slot.starts_at,timezone)}</Button>)}
         </div>
-        <div className="grid md:grid-cols-[330px_1fr]">
-          <div className="border-b border-border p-4 md:border-r md:border-b-0">
-            <Calendar
-              mode="single"
-              required
-              selected={day}
-              onSelect={setDay}
-              month={month}
-              onMonthChange={setMonth}
-              disabled={{ before: new Date(new Date().setHours(0, 0, 0, 0)) }}
-              modifiers={{
-                available: sessions.map(
-                  (session) => new Date(session.starts_at),
-                ),
-              }}
-              modifiersClassNames={{ available: 'calendar-day-available' }}
-            />
-            <p className="mt-3 flex items-center justify-center gap-2 text-xs text-muted-foreground">
-              <span className="size-1.5 rounded-full bg-primary" />
-              Dates with available classes
-            </p>
-          </div>
-          <div className="min-h-80 p-6 sm:p-8">
-            <p className="text-xs font-bold uppercase tracking-widest text-primary">
-              Available times
-            </p>
-            <h3 className="mt-2 text-xl font-bold">
-              {day ? formatDate(day) : 'Choose a date'}
-            </h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              All times in {timezone || 'your local timezone'}
-            </p>
-            {loading ? (
-              <p className="py-12 text-sm text-muted-foreground" role="status">
-                Loading available times…
-              </p>
-            ) : slots.length ? (
-              <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-                {slots.map((slot) => (
-                  <Button
-                    key={slot.id}
-                    variant="outline"
-                    className="h-auto min-h-20 flex-col items-start gap-1 whitespace-normal rounded-xl p-4 text-left hover:border-primary hover:bg-secondary"
-                    onClick={() => {
-                      setSelected(slot)
-                      setTopic('')
-                      setDialogError('')
-                    }}
-                  >
-                    <span className="flex items-center gap-2 font-bold">
-                      <Clock3 className="size-4 text-primary" />
-                      {formatTime(slot.starts_at)}
-                    </span>
-                    <span className="text-xs font-normal text-muted-foreground">
-                      {Math.round(
-                        (+new Date(slot.ends_at) - +new Date(slot.starts_at)) /
-                          60000,
-                      )}{' '}
-                      min · {slot.title}
-                    </span>
-                  </Button>
-                ))}
-              </div>
-            ) : (
-              <div className="mt-8 rounded-xl border border-dashed border-border p-8 text-center">
-                <CalendarDays className="mx-auto size-7 text-muted-foreground" />
-                <p className="mt-3 font-bold">
-                  No available times on this date
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Choose a marked date or check back when your teacher publishes
-                  new times.
-                </p>
-              </div>
-            )}
-          </div>
+        {!slots.length && <p className="py-6 text-sm text-muted-foreground">{loading ? 'Loading availability…' : 'No times available. Try another date, duration or teacher.'}</p>}
         </div>
-      </section>
-      {message && (
-        <p
-          role="status"
-          className="mt-4 rounded-xl border border-border bg-card p-4 text-sm"
-        >
-          {message}
-        </p>
-      )}
-      <section
-        className="mt-6 rounded-2xl border border-border bg-card p-5 sm:p-6"
-        aria-labelledby="classes-heading"
-      >
-        <div className="flex items-center justify-between">
-          <h2 id="classes-heading" className="text-lg font-bold">
-            Your classes
-          </h2>
-          <span className="text-xs text-muted-foreground">
-            {upcoming.length} upcoming
-          </span>
+        <div className="mt-auto pt-6">
+        <Button className="h-11 w-full rounded-xl" disabled={!selected || !validDuration(duration) || busy || loading} onClick={() => {setDialogError('');setConfirming(true)}}>Continue</Button>
+        {replacing && <Button variant="ghost" className="mt-2 w-full" disabled={busy} onClick={() => {setReplacing(null);setMessage('Rescheduling stopped. Your original booking is unchanged.')}}>Keep original booking</Button>}
         </div>
-        <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {bookings.length ? (
-            bookings.map((booking) => (
-              <article
-                key={booking.id}
-                className="rounded-xl border border-border p-4"
-              >
-                <div className="flex items-start justify-between gap-2">
-                  <h3 className="font-bold">
-                    {booking.class_sessions?.title ?? 'Class'}
-                  </h3>
-                  <span className="rounded-full bg-secondary px-2 py-1 text-[10px] font-bold uppercase">
-                    {booking.status}
-                  </span>
-                </div>
-                {booking.class_sessions && (
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    {formatDate(booking.class_sessions.starts_at)} ·{' '}
-                    {formatTime(booking.class_sessions.starts_at)}
-                  </p>
-                )}
-                {booking.status === 'confirmed' && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    disabled={busy}
-                    className="mt-3 text-destructive"
-                    onClick={() => {
-                      setCancelling(booking)
-                      setDialogError('')
-                    }}
-                  >
-                    Cancel class
-                  </Button>
-                )}
-              </article>
-            ))
-          ) : (
-            <p className="py-8 text-sm text-muted-foreground">
-              Your booked classes will appear here.
-            </p>
-          )}
-        </div>
-      </section>
-      <CalendarDialog
-        open={!!selected}
-        onClose={() => setSelected(null)}
-        title="Confirm your class"
-        busy={busy}
-      >
-        {selected && (
-          <>
-            <p className="rounded-xl bg-secondary p-4 text-sm">
-              <strong>{selected.title}</strong>
-              <span className="mt-2 block">
-                {formatDate(selected.starts_at)} ·{' '}
-                {formatTime(selected.starts_at)}–{formatTime(selected.ends_at)}
-              </span>
-              <span className="mt-1 block text-muted-foreground">
-                {timezone}
-              </span>
-            </p>
-            <label
-              htmlFor="booking-topic"
-              className="mt-5 block text-sm font-bold"
-            >
-              What would you like to work on?
-            </label>
-            <textarea
-              id="booking-topic"
-              value={topic}
-              onChange={(event) => setTopic(event.target.value)}
-              maxLength={2000}
-              rows={3}
-              className="mt-2 w-full rounded-xl border border-input bg-background p-3 text-sm"
-              placeholder="Optional topic or note"
-              disabled={busy}
-            />
-            {dialogError && (
-              <p role="alert" className="mt-3 text-sm text-destructive">
-                {dialogError}
-              </p>
-            )}
-            <Button
-              disabled={busy}
-              onClick={() => void book()}
-              className="mt-5 w-full"
-            >
-              <Check />
-              {busy ? 'Booking…' : 'Confirm booking'}
-            </Button>
-          </>
-        )}
-      </CalendarDialog>
-      <CalendarDialog
-        open={!!cancelling}
-        onClose={() => setCancelling(null)}
-        title="Cancel this class?"
-        busy={busy}
-      >
-        <p className="text-sm text-muted-foreground">
-          This will cancel your booking for{' '}
-          {cancelling?.class_sessions
-            ? formatDate(cancelling.class_sessions.starts_at)
-            : 'this class'}
-          .
-        </p>
-        {dialogError && (
-          <p role="alert" className="mt-3 text-sm text-destructive">
-            {dialogError}
-          </p>
-        )}
-        <div className="mt-6 flex gap-3">
-          <Button
-            variant="outline"
-            disabled={busy}
-            onClick={() => setCancelling(null)}
-          >
-            Keep booking
-          </Button>
-          <Button
-            variant="destructive"
-            disabled={busy}
-            onClick={() => void cancel()}
-          >
-            {busy ? 'Cancelling…' : 'Cancel class'}
-          </Button>
-        </div>
-      </CalendarDialog>
-    </CalendarShell>
-  )
+      </div>
+    </section>
+
+    <StudentAgenda bookings={data.bookings} teachers={data.teachers} timezone={timezone} busy={busy} loading={loading} focusBooking={focusBooking} onReschedule={reschedule} onCancel={booking=>{setDialogError('');setCancelling(booking)}} onBook={()=>{document.getElementById('booking-teacher')?.focus();document.getElementById('booking-page')?.scrollIntoView({behavior:'smooth'})}} />
+
+    <CalendarDialog open={confirming} onClose={()=>setConfirming(false)} busy={busy} title={replacing?'Reschedule class':'Confirm your class'}>
+      <form onSubmit={event=>{event.preventDefault();void book()}} className="space-y-4">
+        <p className="font-bold">{teacher?.display_name} · {classType==='trial'?'Trial Class':'Regular Class'} · {duration} min</p>
+        {selected && <p className="text-sm">{dateInZone(selected.starts_at,timezone)} · {timeInZone(selected.starts_at,timezone)} – {timeInZone(selected.ends_at,timezone)}</p>}
+        <p className="text-sm text-muted-foreground">{provider==='zoom'?'Zoom':'Google Meet'} · {timezone}</p>
+        <p className="text-sm">Credits required: {creditsRequired} · Available: {data.availableCredits ?? 'Not configured'}</p>
+        <label className="block text-sm font-bold" htmlFor="class-topic">What would you like to work on? (optional)</label>
+        <textarea id="class-topic" className={inputClass} maxLength={2000} value={topic} onChange={e=>setTopic(e.target.value)} />
+        {dialogError && <p role="alert" className="text-sm text-destructive">{dialogError}</p>}
+        <Button type="submit" disabled={busy||!selected} className="w-full">{busy?'Securing your time…':replacing?'Confirm new time':'Confirm booking'}</Button>
+      </form>
+    </CalendarDialog>
+    <CalendarDialog open={!!cancelling} onClose={()=>setCancelling(null)} busy={busy} title="Cancel this class?">
+      <p className="mb-4 text-sm text-muted-foreground">Your reserved time will become available for other students.</p>
+      {dialogError && <p role="alert" className="mb-4 text-sm text-destructive">{dialogError}</p>}
+      <div className="flex gap-3"><Button variant="outline" disabled={busy} onClick={()=>setCancelling(null)}>Keep class</Button><Button disabled={busy} onClick={()=>void cancel()}>{busy?'Cancelling…':'Cancel class'}</Button></div>
+    </CalendarDialog>
+  </CalendarShell>
 }

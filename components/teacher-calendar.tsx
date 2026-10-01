@@ -14,7 +14,7 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import type { EventApi } from '@fullcalendar/core'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
+import { createTeacherRepository } from '@/lib/calendar/teacher-repository'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { CalendarDialog } from '@/components/ui/calendar-dialog'
@@ -24,7 +24,6 @@ import {
   formatDate,
   formatTime,
   localInput,
-  sessionFields,
   type Availability,
   type CalendarProps,
   type Session,
@@ -52,10 +51,11 @@ const inputClass =
 
 export function TeacherCalendar(props: CalendarProps) {
   const { profileId } = props
-  const supabase = useMemo(() => createClient(), [])
+  const repository = useMemo(() => createTeacherRepository(), [])
   const calendar = useRef<FullCalendar>(null)
   const [sessions, setSessions] = useState<Session[]>([])
   const [availability, setAvailability] = useState<Availability[]>([])
+  const [students, setStudents] = useState<Record<string,string>>({})
   const [timezone, setTimezone] = useState('')
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState(false)
@@ -69,30 +69,20 @@ export function TeacherCalendar(props: CalendarProps) {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const [slots, hours] = await Promise.all([
-        supabase
-          .from('class_sessions')
-          .select(sessionFields)
-          .eq('teacher_id', profileId)
-          .order('starts_at'),
-        supabase
-          .from('teacher_availability')
-          .select('id, day_of_week, start_time, end_time, timezone, is_active')
-          .eq('teacher_id', profileId)
-          .order('day_of_week'),
-      ])
-      if (slots.error || hours.error) {
+      const [slots, hours, enrolled] = await repository.load(profileId)
+      if (slots.error || hours.error || enrolled.error) {
         setMessage('Could not load your schedule. Please refresh to try again.')
         return
       }
       setSessions((slots.data ?? []) as Session[])
       setAvailability((hours.data ?? []) as Availability[])
+      setStudents(Object.fromEntries((enrolled.data ?? []).map((item: { session_id: string; student_name: string }) => [item.session_id,item.student_name])))
     } catch {
       setMessage('Could not connect to your schedule. Please try again.')
     } finally {
       setLoading(false)
     }
-  }, [profileId, supabase])
+  }, [profileId, repository])
   useEffect(() => {
     setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
     const today = new Date()
@@ -173,23 +163,13 @@ export function TeacherCalendar(props: CalendarProps) {
           timezone,
           is_active: true,
         }
-        const result = existing
-          ? await supabase
-              .from('teacher_availability')
-              .update(values)
-              .eq('id', existing.id)
-              .eq('teacher_id', profileId)
-              .select('id')
-          : await supabase
-              .from('teacher_availability')
-              .insert(values)
-              .select('id')
+        const result = await repository.saveHours(values, existing?.id)
         if (result.error || !result.data?.length) {
           setDialogError('Could not save weekly hours. Please try again.')
           return
         }
         setMessage(
-          'Weekly availability saved. Publish individual class slots so students can book them.',
+          'Weekly availability published. Students can now book 30- or 60-minute classes within these hours.',
         )
       } else {
         const values = {
@@ -197,23 +177,7 @@ export function TeacherCalendar(props: CalendarProps) {
           starts_at: start.toISOString(),
           ends_at: end.toISOString(),
         }
-        const result = draft.id
-          ? await supabase
-              .from('class_sessions')
-              .update(values)
-              .eq('id', draft.id)
-              .eq('teacher_id', profileId)
-              .eq('status', 'open')
-              .select('id')
-          : await supabase
-              .from('class_sessions')
-              .insert({
-                ...values,
-                teacher_id: profileId,
-                timezone,
-                status: 'open',
-              })
-              .select('id')
+        const result = await repository.saveSlot(profileId,values,timezone,draft.id)
         if (result.error || !result.data?.length) {
           setDialogError(
             'Could not save this slot. It may have been booked. Refresh and try again.',
@@ -251,13 +215,7 @@ export function TeacherCalendar(props: CalendarProps) {
     }
     setBusy(true)
     try {
-      const { data, error } = await supabase
-        .from('class_sessions')
-        .update({ starts_at: start.toISOString(), ends_at: end.toISOString() })
-        .eq('id', event.id)
-        .eq('teacher_id', profileId)
-        .eq('status', 'open')
-        .select('id')
+      const { data, error } = await repository.moveSlot(profileId,event.id,start,end)
       if (error || !data?.length) {
         revert()
         setMessage('Could not update this slot. It may have been booked.')
@@ -290,13 +248,7 @@ export function TeacherCalendar(props: CalendarProps) {
     setBusy(true)
     setDialogError('')
     try {
-      const { data, error } = await supabase
-        .from('class_sessions')
-        .update({ status })
-        .eq('id', draft.id)
-        .eq('teacher_id', profileId)
-        .eq('status', draft.status)
-        .select('id')
+      const { data, error } = await repository.changeStatus(profileId,draft.id,draft.status,status)
       if (error || !data?.length) {
         setDialogError(
           'Could not update this class. Please refresh and try again.',
@@ -315,7 +267,7 @@ export function TeacherCalendar(props: CalendarProps) {
 
   const events = sessions.map((session) => ({
     id: session.id,
-    title: session.title,
+    title: students[session.id] || session.title,
     start: session.starts_at,
     end: session.ends_at,
     editable:
@@ -323,7 +275,7 @@ export function TeacherCalendar(props: CalendarProps) {
       session.status === 'open' &&
       new Date(session.starts_at) > new Date(),
     classNames: [`schedule-event-${session.status}`],
-    extendedProps: { status: session.status },
+    extendedProps: { status: session.status, studentName: students[session.id] },
   }))
   const recurringHours = availability
     .filter((item) => item.is_active && item.timezone === timezone)
