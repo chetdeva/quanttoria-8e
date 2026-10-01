@@ -31,8 +31,15 @@ function GoogleIcon() {
   )
 }
 
+// The dev redirect proxy only exists for the v0 preview; deployed builds must
+// return to the origin the user is actually on.
 const redirectUrl = () =>
-  process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ?? `${window.location.origin}/auth/callback`
+  (process.env.NODE_ENV !== 'production'
+    ? process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL
+    : undefined) ?? `${window.location.origin}/auth/callback`
+
+const isMobileDevice = () =>
+  window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 640
 
 const OAUTH_POPUP_MESSAGE = 'quanttoria-oauth-callback'
 
@@ -93,6 +100,20 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
     setGoogleLoading(true)
     try {
       const supabase = createClient()
+
+      // Mobile browsers turn pop-ups into tabs, so use a regular redirect there.
+      if (isMobileDevice()) {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: redirectUrl() },
+        })
+        if (error) {
+          setMessage('We could not start Google sign-in. Please try again.')
+          setGoogleLoading(false)
+        }
+        return
+      }
+
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: redirectUrl(), skipBrowserRedirect: true },
