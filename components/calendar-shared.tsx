@@ -1,5 +1,5 @@
 'use client'
-import { CalendarDays, RefreshCw } from 'lucide-react'
+import { CalendarDays, ListChecks, RefreshCw } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -33,6 +33,7 @@ export const localInput = (date: Date) =>
 export function CalendarShell({
   role,
   profileName,
+  profileId,
   isAdminView,
   timezone,
   loading,
@@ -82,10 +83,24 @@ export function CalendarShell({
               · {timezone || 'Loading timezone…'}
             </p>
           </div>
-          <Button variant="outline" disabled={loading} onClick={onRefresh}>
-            <RefreshCw className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              nativeButton={false}
+              render={
+                <Link
+                  href={`/${role}/bookings${isAdminView ? `?userId=${encodeURIComponent(profileId)}` : ''}`}
+                />
+              }
+            >
+              <ListChecks />
+              My bookings
+            </Button>
+            <Button variant="outline" disabled={loading} onClick={onRefresh}>
+              <RefreshCw className={loading ? 'animate-spin' : ''} />
+              Refresh
+            </Button>
+          </div>
         </header>
         {children}
       </div>
