@@ -14,6 +14,7 @@ type Props = {
   now: number
   busy: boolean
   scheduleHref: string
+  suffix: string
   onCancel: (item: BookingItem) => void
   onComplete: (item: BookingItem) => void
 }
@@ -25,7 +26,7 @@ export function initials(name: string) {
   return name.split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join('') || '?'
 }
 
-export function BookingCard({ item, role, timezone, now, busy, scheduleHref, onCancel, onComplete }: Props) {
+export function BookingCard({ item, role, timezone, now, busy, scheduleHref, suffix, onCancel, onComplete }: Props) {
   const start = Date.parse(item.startsAt)
   const duration = Math.round((Date.parse(item.endsAt) - start) / 60000)
   const joinable = canJoin(item, now)
@@ -123,7 +124,7 @@ export function BookingCard({ item, role, timezone, now, busy, scheduleHref, onC
             Mark complete
           </Button>
         )}
-        {role === 'teacher' && item.status === 'completed' && Date.parse(item.endsAt) <= now && (
+        {role === 'teacher' && item.status === 'completed' && (
           <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
             <CheckCircle2 className="size-4" aria-hidden="true" />
             Session ended
@@ -150,24 +151,24 @@ export function BookingCard({ item, role, timezone, now, busy, scheduleHref, onC
                 </MenuItem>
               )}
               {item.bookingId && item.status !== 'cancelled' && (
-                <MenuItem className={menuItem} href={`/api/calendar/bookings/${item.bookingId}/calendar`} download>
+                <MenuItem className={menuItem} href={`/api/calendar/bookings/${item.bookingId}/calendar${suffix}`} download>
                   <CalendarPlus className="size-4" aria-hidden="true" />
                   Add to Google / iCal
                 </MenuItem>
               )}
-              {role === 'teacher' && item.status === 'upcoming' && isLive && (
+              {role === 'teacher' && item.status === 'upcoming' && (
                 <MenuItem id="complete" className={menuItem}>
                   <CheckCircle2 className="size-4" aria-hidden="true" />
-                  Mark attendance / complete
+                  Mark as complete
                 </MenuItem>
               )}
-              {role === 'student' && manageable && (
+              {manageable && (
                 <MenuItem id="cancel" className={cn(menuItem, 'text-destructive')}>
                   <XCircle className="size-4" aria-hidden="true" />
-                  Cancel booking
+                  {role === 'teacher' ? 'Cancel session' : 'Cancel booking'}
                 </MenuItem>
               )}
-              {!manageable && !item.bookingId && !(role === 'teacher' && isLive) && (
+              {!manageable && !item.bookingId && !(role === 'teacher' && item.status === 'upcoming') && (
                 <MenuItem className={menuItem} isDisabled>
                   No actions available
                 </MenuItem>

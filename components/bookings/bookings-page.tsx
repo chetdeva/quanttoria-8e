@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import useSWR from 'swr'
+import { toast } from 'sonner'
 import { ArrowLeft, CalendarPlus, RefreshCw } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { CalendarDialog } from '@/components/ui/calendar-dialog'
@@ -66,7 +67,7 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
   const [cancelling, setCancelling] = useState<BookingItem | null>(null)
   const [reason, setReason] = useState(cancelReasons[0])
   const [busy, setBusy] = useState(false)
-  const [notice, setNotice] = useState('')
+  const [completing, setCompleting] = useState<BookingItem | null>(null)
 
   useEffect(() => {
     setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)
@@ -97,29 +98,64 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
   const dashboardHref = `/${role}/dashboard${suffix}`
   const name = profileName?.trim().split(' ')[0] || (role === 'teacher' ? 'Teacher' : 'Student')
 
-  async function confirmCancel() {
-    if (!cancelling?.bookingId || busy) return
-    setBusy(true)
+  async function refresh() {
     try {
-      await calendarRequest(`/bookings/${cancelling.bookingId}${suffix}`, { method: 'DELETE' })
-      setNotice('Booking cancelled.')
+      await toast.promise(mutate(), {
+        loading: 'Refreshing bookings…',
+        success: 'Bookings up to date.',
+        error: 'Could not refresh bookings.',
+      }).unwrap()
+    } catch {}
+  }
+
+  async function confirmCancel() {
+    const target = cancelling
+    if (!target || busy) return
+    setBusy(true)
+    const action = (async () => {
+      if (role === 'teacher') {
+        const result = await createTeacherRepository().changeStatus(profileId, target.sessionId, 'confirmed', 'cancelled')
+        if (result.error || !result.data?.length) throw new Error('Could not cancel this session.')
+      } else {
+        if (!target.bookingId) throw new Error('Could not cancel this booking.')
+        await calendarRequest(`/bookings/${target.bookingId}${suffix}`, { method: 'DELETE' })
+      }
       setCancelling(null)
       await mutate()
-    } catch (err) {
-      setNotice(err instanceof Error ? err.message : 'Could not cancel this booking.')
+    })()
+    toast.promise(action, {
+      loading: role === 'teacher' ? 'Cancelling session…' : 'Cancelling booking…',
+      success: role === 'teacher' ? 'Session cancelled.' : 'Booking cancelled.',
+      error: err => (err instanceof Error ? err.message : 'Could not cancel.'),
+    })
+    try {
+      await action
+    } catch {
       setCancelling(null)
     } finally {
       setBusy(false)
     }
   }
 
-  async function complete(item: BookingItem) {
-    if (busy) return
+  async function confirmComplete() {
+    const target = completing
+    if (!target || busy) return
     setBusy(true)
-    try {
-      const result = await createTeacherRepository().changeStatus(profileId, item.sessionId, 'confirmed', 'completed')
-      setNotice(result.error ? 'Could not mark this class complete.' : 'Class marked complete.')
+    const action = (async () => {
+      const result = await createTeacherRepository().changeStatus(profileId, target.sessionId, 'confirmed', 'completed')
+      if (result.error) throw new Error('Could not mark this class complete.')
+      setCompleting(null)
       await mutate()
+    })()
+    toast.promise(action, {
+      loading: 'Marking class complete…',
+      success: 'Class marked complete.',
+      error: err => (err instanceof Error ? err.message : 'Could not mark complete.'),
+    })
+    try {
+      await action
+    } catch {
+      setCompleting(null)
     } finally {
       setBusy(false)
     }
@@ -142,13 +178,13 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" disabled={isValidating} onClick={() => void mutate()}>
+            <Button variant="outline" disabled={isValidating} onClick={() => void refresh()}>
               <RefreshCw className={isValidating ? 'animate-spin' : ''} />
               Refresh
             </Button>
             <Button nativeButton={false} render={<Link href={dashboardHref} />}>
               <CalendarPlus />
-              {role === 'teacher' ? 'Set availability' : 'Book new session'}
+              {role === 'teacher' ? 'Set availability' : 'Book a session'}
             </Button>
           </div>
         </header>
@@ -168,11 +204,6 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
           searchLabel={role === 'teacher' ? 'Search by student, topic or booking ID' : 'Search by tutor, topic or booking ID'}
         />
 
-        {notice && (
-          <p role="status" className="rounded-xl border border-border bg-card p-4 text-sm">
-            {notice}
-          </p>
-        )}
         {error && (
           <p role="alert" className="rounded-xl border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {error instanceof Error ? error.message : 'Could not load bookings.'}
@@ -194,11 +225,12 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
                 now={now}
                 busy={busy}
                 scheduleHref={dashboardHref}
+                suffix={suffix}
                 onCancel={target => {
                   setReason(cancelReasons[0])
                   setCancelling(target)
                 }}
-                onComplete={target => void complete(target)}
+                onComplete={target => setCompleting(target)}
               />
             ))}
             {!isLoading && !visible.length && (
@@ -209,7 +241,7 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
                 </p>
                 {!items.length && (
                   <Button className="mt-4" nativeButton={false} render={<Link href={dashboardHref} />}>
-                    {role === 'teacher' ? 'Set availability' : 'Book new session'}
+                    {role === 'teacher' ? 'Set availability' : 'Book a session'}
                   </Button>
                 )}
               </div>
@@ -218,7 +250,7 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
         )}
       </div>
 
-      <CalendarDialog open={!!cancelling} onClose={() => setCancelling(null)} title="Cancel this booking?" busy={busy}>
+      <CalendarDialog open={!!cancelling} onClose={() => setCancelling(null)} title={role === 'teacher' ? 'Cancel this session?' : 'Cancel this booking?'} busy={busy}>
         {cancelling && (
           <div className="space-y-4">
             <p className="text-sm">
@@ -237,14 +269,32 @@ export function BookingsPage({ role, profileId, profileName, isAdminView }: Prop
               </select>
             </label>
             <p className="rounded-lg bg-muted p-3 text-xs text-muted-foreground">
-              Cancelling frees this time for other students. Please contact your tutor if you are cancelling close to the start time.
+              {role === 'teacher' ? 'The student will lose this session. Please let them know why you are cancelling.' : 'Cancelling frees this time for other students. Please contact your tutor if you are cancelling close to the start time.'}
             </p>
             <div className="flex justify-end gap-2">
               <Button variant="outline" disabled={busy} onClick={() => setCancelling(null)}>
-                Keep booking
+                {role === 'teacher' ? 'Keep session' : 'Keep booking'}
               </Button>
               <Button variant="destructive" disabled={busy} onClick={() => void confirmCancel()}>
-                {busy ? 'Cancelling…' : 'Cancel booking'}
+                {busy ? 'Cancelling…' : role === 'teacher' ? 'Cancel session' : 'Cancel booking'}
+              </Button>
+            </div>
+          </div>
+        )}
+      </CalendarDialog>
+
+      <CalendarDialog open={!!completing} onClose={() => setCompleting(null)} title="Mark class as complete?" busy={busy}>
+        {completing && (
+          <div className="space-y-4">
+            <p className="text-sm">
+              {completing.subject} with <b>{completing.person}</b> on {dateInZone(completing.startsAt, timezone)} at {timeInZone(completing.startsAt, timezone)}.
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" disabled={busy} onClick={() => setCompleting(null)}>
+                Not yet
+              </Button>
+              <Button disabled={busy} onClick={() => void confirmComplete()}>
+                {busy ? 'Saving…' : 'Mark complete'}
               </Button>
             </div>
           </div>

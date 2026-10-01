@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Baloo_2, Nunito } from 'next/font/google'
+import { Toaster } from 'sonner'
 import { GlobalProgressBar } from '@/components/global-progress-bar'
 import './globals.css'
 
@@ -57,6 +58,7 @@ export default function RootLayout({
       <body className="antialiased">
         <GlobalProgressBar />
         {children}
+        <Toaster position="top-center" richColors closeButton />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
