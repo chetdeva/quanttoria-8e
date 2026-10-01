@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { CalendarDays, Clock3, Video } from 'lucide-react'
+import { CalendarDays, Video } from 'lucide-react'
+import { CalendarDuration } from '@/components/calendar-duration'
 import { StudentAgenda } from '@/components/student-agenda'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
@@ -19,7 +20,6 @@ export function StudentCalendar(props: CalendarProps) {
   const [teacherId, setTeacherId] = useState('')
   const [classType, setClassType] = useState<ClassType>('regular')
   const [duration, setDuration] = useState(60)
-  const [customDuration, setCustomDuration] = useState(false)
   const [provider, setProvider] = useState<VideoProvider>('zoom')
   const [day, setDay] = useState<Date>()
   const [month, setMonth] = useState<Date>()
@@ -82,7 +82,7 @@ export function StudentCalendar(props: CalendarProps) {
     if (!session) return
     setReplacing(booking); setTeacherId(session.teacher_id); setClassType(booking.class_type)
     const minutes = (Date.parse(session.ends_at) - Date.parse(session.starts_at))/60000
-    setDuration(minutes); setCustomDuration(minutes !== 30 && minutes !== 60)
+    setDuration(minutes)
     setProvider(booking.video_provider); setTopic(booking.topic || ''); setSelected(null)
     setMessage('Choose a new time. Your existing reservation stays confirmed until the new time is secured.')
     document.getElementById('booking-page')?.scrollIntoView({ behavior: 'smooth' })
@@ -101,7 +101,7 @@ export function StudentCalendar(props: CalendarProps) {
         <h2 className="mt-4 font-display text-2xl font-bold">{teacher?.display_name || 'Choose a teacher'}</h2>
         <p className="mt-1 text-sm text-muted-foreground">{teacher ? `${teacher.subject} · ${teacher.grade_range}` : 'One-to-one maths coaching'}</p>
         <fieldset className="mt-6"><legend className="mb-2 text-sm font-bold">Choose class</legend><div className="flex gap-2">{(['regular', 'trial'] as const).map(type => <Button key={type} size="sm" variant={classType === type ? 'default' : 'outline'} aria-pressed={classType === type} onClick={() => setClassType(type)}>{type === 'trial' ? 'Trial Class' : 'Regular Class'}</Button>)}</div></fieldset>
-        <fieldset className="mt-6"><legend className="mb-2 flex items-center gap-2 text-sm font-bold"><Clock3 className="size-4" />Duration</legend><div className="flex flex-wrap gap-3">{([30,60] as const).map(value => <label key={value} className="flex items-center gap-2 text-sm"><input type="radio" name="duration" value={value} checked={!customDuration && duration === value} onChange={() => {setCustomDuration(false);setDuration(value)}} className="accent-primary" />{value} min</label>)}<label className="flex items-center gap-2 text-sm"><input type="radio" name="duration" checked={customDuration} onChange={()=>setCustomDuration(true)} className="accent-primary" />Custom</label></div>{customDuration && <div className="mt-3"><label htmlFor="custom-duration" className="mb-2 block text-sm">Duration in minutes</label><input id="custom-duration" type="number" min={15} max={180} step={15} value={duration || ''} onChange={e=>setDuration(Number(e.target.value))} aria-describedby="duration-help" aria-invalid={!validDuration(duration)} className={inputClass} /><p id="duration-help" className="mt-1 text-xs text-muted-foreground">15–180 minutes, in 15-minute steps.</p></div>}</fieldset>
+        <CalendarDuration value={duration} onChange={setDuration} className="mt-6" />
         <dl className="mt-5 space-y-2 rounded-xl border border-border bg-background p-3 text-sm" aria-label="Class credits"><div className="flex justify-between gap-2"><dt>Available credits</dt><dd className="font-bold">{loading ? 'Loading…' : data.availableCredits == null ? 'Not configured' : data.availableCredits}</dd></div><div className="flex justify-between gap-2"><dt>Credits required</dt><dd className="font-bold">{creditsRequired ?? '—'}</dd></div></dl><p className="mt-1 text-xs text-muted-foreground">1 credit per hour, prorated. Applies to both class types.</p>
         <label htmlFor="video-provider" className="mt-6 mb-2 flex items-center gap-2 text-sm font-bold"><Video className="size-4" />Video call</label>
         <select id="video-provider" className={inputClass} value={provider} onChange={e => setProvider(e.target.value as VideoProvider)}><option value="zoom">Zoom</option><option value="google_meet">Google Meet</option></select>

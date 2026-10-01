@@ -15,6 +15,8 @@ import interactionPlugin from '@fullcalendar/interaction'
 import type { EventApi } from '@fullcalendar/core'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { createTeacherRepository } from '@/lib/calendar/teacher-repository'
+import { availabilityEnd, weekdays } from '@/lib/calendar/teacher-availability'
+import { CalendarDuration } from '@/components/calendar-duration'
 import { Button } from '@/components/ui/button'
 import { Calendar } from '@/components/ui/calendar'
 import { CalendarDialog } from '@/components/ui/calendar-dialog'
@@ -44,6 +46,8 @@ type Draft = {
   start: string
   end: string
   weekly: boolean
+  weekdays: number[]
+  duration: number
   status: string
 }
 const inputClass =
@@ -102,6 +106,8 @@ export function TeacherCalendar(props: CalendarProps) {
       start: localInput(start),
       end: localInput(end),
       weekly: false,
+      weekdays: [start.getDay()],
+      duration: Math.round((+end-+start)/60000),
       status: 'open',
     })
   }
@@ -134,6 +140,18 @@ export function TeacherCalendar(props: CalendarProps) {
     if (!draft || busy) return
     const start = new Date(draft.start)
     const end = new Date(draft.end)
+    if (Number.isFinite(+start) && Number.isFinite(+end) && (localInput(start)!==draft.start || localInput(end)!==draft.end)) {
+      setDialogError('This time does not exist in your timezone because of daylight saving. Choose another time.')
+      return
+    }
+    if (!Number.isInteger(draft.duration) || draft.duration < 15 || draft.duration > 1440 || draft.duration % 15 !== 0) {
+      setDialogError('Choose an availability duration from 15 minutes to 24 hours, in 15-minute steps.')
+      return
+    }
+    if (draft.weekly && !draft.weekdays.length) {
+      setDialogError('Choose at least one weekday.')
+      return
+    }
     const validation = validRange(start, end, draft.id, draft.weekly)
     if (validation) {
       setDialogError(validation)
@@ -151,25 +169,13 @@ export function TeacherCalendar(props: CalendarProps) {
     setDialogError('')
     try {
       if (draft.weekly) {
-        const existing = availability.find(
-          (item) =>
-            item.day_of_week === start.getDay() && item.timezone === timezone,
-        )
-        const values = {
-          teacher_id: profileId,
-          day_of_week: start.getDay(),
-          start_time: draft.start.slice(11),
-          end_time: draft.end.slice(11),
-          timezone,
-          is_active: true,
-        }
-        const result = await repository.saveHours(values, existing?.id)
+        const result = await repository.saveWeeklyHours(profileId,draft.weekdays,draft.start,draft.end,timezone,availability)
         if (result.error || !result.data?.length) {
           setDialogError('Could not save weekly hours. Please try again.')
           return
         }
         setMessage(
-          'Weekly availability published. Students can now book 30- or 60-minute classes within these hours.',
+          'Weekly availability published for your selected weekdays. Students can book classes within these hours.',
         )
       } else {
         const values = {
@@ -309,7 +315,7 @@ export function TeacherCalendar(props: CalendarProps) {
             onClick={() => {
               const start = new Date()
               start.setHours(start.getHours() + 1, 0, 0, 0)
-              createDraft(start, new Date(+start + 3600000))
+              createDraft(start, new Date(+start + 1800000))
             }}
           >
             <Plus />
@@ -332,8 +338,8 @@ export function TeacherCalendar(props: CalendarProps) {
           <div className="mt-4 border-t border-border pt-4">
             <h2 className="text-sm font-bold">Weekly availability</h2>
             <p className="mt-2 text-xs leading-5 text-muted-foreground">
-              Drag a range in the grid and choose “Repeat every week” to set
-              working hours.
+              Create availability or drag a range, then choose “Repeat every week”
+              and select the weekdays for your working hours.
             </p>
             <div className="mt-3 space-y-2">
               {availability
@@ -469,7 +475,7 @@ export function TeacherCalendar(props: CalendarProps) {
                 if (info.allDay) {
                   const start = new Date(info.start)
                   start.setHours(9)
-                  createDraft(start, new Date(+start + 3600000))
+                  createDraft(start, new Date(+start + 1800000))
                 } else createDraft(info.start, info.end)
               }}
               eventDrop={(info) => void move(info.event, info.revert)}
@@ -486,6 +492,8 @@ export function TeacherCalendar(props: CalendarProps) {
                     start: localInput(new Date(session.starts_at)),
                     end: localInput(new Date(session.ends_at)),
                     weekly: false,
+                    weekdays: [new Date(session.starts_at).getDay()],
+                    duration: Math.round((Date.parse(session.ends_at)-Date.parse(session.starts_at))/60000),
                     status: session.status,
                   })
                 }
@@ -551,7 +559,7 @@ export function TeacherCalendar(props: CalendarProps) {
                   type="datetime-local"
                   value={draft.start}
                   onChange={(event) =>
-                    setDraft({ ...draft, start: event.target.value })
+                    setDraft({ ...draft, start: event.target.value, end: availabilityEnd(event.target.value,draft.duration) })
                   }
                   required
                   disabled={busy || readOnly}
@@ -564,7 +572,7 @@ export function TeacherCalendar(props: CalendarProps) {
                   type="datetime-local"
                   value={draft.end}
                   onChange={(event) =>
-                    setDraft({ ...draft, end: event.target.value })
+                    setDraft({ ...draft, end: event.target.value, duration: Math.round((+new Date(event.target.value)-+new Date(draft.start))/60000) })
                   }
                   required
                   disabled={busy || readOnly}
@@ -572,6 +580,8 @@ export function TeacherCalendar(props: CalendarProps) {
                 />
               </label>
             </div>
+            {!readOnly && <CalendarDuration value={draft.duration} max={1440} disabled={busy}
+              onChange={duration=>setDraft({...draft,duration,end:availabilityEnd(draft.start,duration)})} />}
             {!draft.id && (
               <label className="flex items-center gap-3 rounded-xl bg-secondary p-3 text-sm">
                 <input
@@ -586,10 +596,30 @@ export function TeacherCalendar(props: CalendarProps) {
               </label>
             )}
             {draft.weekly && (
-              <p className="text-xs text-muted-foreground">
-                Updates weekly hours for this weekday in {timezone}. Working
-                hours guide your schedule; publish class slots separately.
-              </p>
+              <fieldset>
+                <legend className="mb-2 text-sm font-bold">Repeat on</legend>
+                <label className="mb-2 flex items-center gap-2 rounded-lg border border-border p-2 text-sm font-bold">
+                  <input type="checkbox" checked={weekdays.every(day=>draft.weekdays.includes(day.value))} disabled={busy}
+                    onChange={event=>setDraft({...draft,weekdays:event.target.checked?weekdays.map(day=>day.value):[]})} />
+                  Every day
+                </label>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {weekdays.map(day => (
+                    <label key={day.value} className="flex items-center gap-2 rounded-lg border border-border p-2 text-sm">
+                      <input type="checkbox" checked={draft.weekdays.includes(day.value)} disabled={busy}
+                        onChange={event => setDraft({...draft,weekdays:event.target.checked
+                          ? [...draft.weekdays,day.value]
+                          : draft.weekdays.filter(value => value!==day.value)})}
+                      />
+                      Every {day.label}
+                    </label>
+                  ))}
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">
+                  The same time range repeats on each selected day in {timezone}.
+                  Existing working hours are preserved.
+                </p>
+              </fieldset>
             )}
             {readOnly && (
               <p className="text-sm text-muted-foreground">

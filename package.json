@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test:calendar": "node --experimental-strip-types --test tests/calendar.test.mjs tests/calendar-client.test.mjs tests/calendar-providers.test.mjs tests/calendar-routes.test.mjs && node tests/calendar-database.mjs"
+    "test:calendar": "node --experimental-strip-types --test tests/calendar.test.mjs tests/calendar-client.test.mjs tests/calendar-providers.test.mjs tests/calendar-routes.test.mjs tests/teacher-availability.test.mjs && node tests/calendar-database.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
