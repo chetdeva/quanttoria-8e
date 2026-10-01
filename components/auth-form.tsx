@@ -1,6 +1,6 @@
 'use client'
 
-import { FormEvent, useEffect, useRef, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import Image from 'next/image'
 import { Eye, EyeOff, LoaderCircle } from 'lucide-react'
 import { Logo } from '@/components/logo'
@@ -38,22 +38,6 @@ const redirectUrl = () =>
     ? process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL
     : undefined) ?? `${window.location.origin}/auth/callback`
 
-const isMobileDevice = () =>
-  window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 640
-
-const OAUTH_POPUP_MESSAGE = 'quanttoria-oauth-callback'
-
-function openOAuthPopup(url: string) {
-  const width = 480
-  const height = 640
-  const left = window.screenX + Math.max(0, (window.outerWidth - width) / 2)
-  const top = window.screenY + Math.max(0, (window.outerHeight - height) / 2)
-  return window.open(
-    url,
-    'quanttoria-google-signin',
-    `width=${width},height=${height},left=${left},top=${top},toolbar=no,menubar=no`,
-  )
-}
 
 export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' | 'forgot' }) {
   const isSignup = mode === 'signup' || mode === 'admin-signup'
@@ -68,52 +52,14 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
-  const popupRef = useRef<Window | null>(null)
-
-  useEffect(() => {
-    // BroadcastChannel carries the result instead of window.opener.postMessage
-    // because Google's own sign-in pages send a Cross-Origin-Opener-Policy
-    // header that severs window.opener once the pop-up navigates there, even
-    // after it's redirected back to our origin.
-    if (typeof BroadcastChannel === 'undefined') return
-
-    const channel = new BroadcastChannel(OAUTH_POPUP_MESSAGE)
-    channel.onmessage = (event) => {
-      const success = Boolean((event.data as { success?: boolean } | undefined)?.success)
-
-      popupRef.current?.close()
-      popupRef.current = null
-
-      if (success) {
-        window.location.href = '/dashboard'
-      } else {
-        setGoogleLoading(false)
-        setMessage('We could not complete Google sign-in. Please try again.')
-      }
-    }
-
-    return () => channel.close()
-  }, [])
-
   async function signInWithGoogle() {
     setMessage('')
     setGoogleLoading(true)
     try {
       const supabase = createClient()
-
-      // Mobile browsers turn pop-ups into tabs, so use a regular redirect there.
-      if (isMobileDevice()) {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: { redirectTo: redirectUrl() },
-        })
-        if (error) {
-          setMessage('We could not start Google sign-in. Please try again.')
-          setGoogleLoading(false)
-        }
-        return
-      }
-
+      // Same-tab navigation works on desktop/mobile and does not depend on
+      // popup permissions, window.opener, or BroadcastChannel support.
+      document.cookie = 'oauth_popup=; path=/; max-age=0; SameSite=Lax'
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: redirectUrl(), skipBrowserRedirect: true },
@@ -123,29 +69,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
         setGoogleLoading(false)
         return
       }
-
-      // Tells /auth/callback this is the pop-up flow (rather than a normal
-      // email-link redirect), since window.opener can't be relied on once
-      // Google's pages are involved.
-      document.cookie = 'oauth_popup=1; path=/; max-age=120; SameSite=Lax'
-
-      const popup = openOAuthPopup(data.url)
-      if (!popup) {
-        setMessage('Please allow pop-ups for this site to sign in with Google.')
-        setGoogleLoading(false)
-        return
-      }
-      popupRef.current = popup
-
-      const pollClosed = setInterval(() => {
-        if (popup.closed) {
-          clearInterval(pollClosed)
-          if (popupRef.current) {
-            popupRef.current = null
-            setGoogleLoading(false)
-          }
-        }
-      }, 500)
+      window.location.assign(data.url)
     } catch {
       setMessage('We could not start Google sign-in. Please try again.')
       setGoogleLoading(false)
@@ -320,7 +244,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'signup' | 'admin-signup' |
 
         {mode === 'login' && (
           <div className="mt-6 flex justify-center text-center text-sm text-muted-foreground">
-            <Link href="/admin-signup" className="text-xs font-semibold text-muted-foreground hover:text-primary hover:underline">Register as an admin</Link>
+            <Link href="/signup" className="text-xs font-semibold text-muted-foreground hover:text-primary hover:underline">Create account</Link>
           </div>
         )}
       </div>
