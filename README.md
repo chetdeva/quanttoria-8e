@@ -28,11 +28,15 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 Both dashboards use the existing Supabase clients and tables. Set the Supabase variables from `.env.example` in `.env.local`; no Google Calendar account or calendar URL is required.
 
-- Teachers use FullCalendar's week, day, and month views. Drag a time range or use **Create class slot** to publish a class. Open future slots can be moved or resized; failed saves revert the change. Click a class to edit it, block/reopen it, or mark a confirmed class completed.
-- Choose **Repeat every week as working hours** to save a rule in `teacher_availability`. Rules in the browser's timezone appear as background bands. Rules saved in another timezone are listed with their original timezone. Weekly hours do not create bookable sessions; publish individual slots in `class_sessions`.
-- Students use a React DayPicker month calendar to choose a date, then select a published slot and confirm a booking through `class_bookings`. Booking and cancellation dialogs use React Aria for focus management and keyboard access.
+- Teachers use FullCalendar's week/day/month views, with student names on booked classes. Publish dated windows or recurring weekly working hours. Both are bookable; open windows can be moved/resized, with database conflict checks.
+- Students use a native Cal.com-style teacher/date/time booking page with trial/regular classes, 30/60-minute durations, Zoom/Google Meet preference, timezone selection, confirmation cards, cancellation and rescheduling.
+- Calendar data access, slot generation and provider adapters are isolated in `lib/calendar`, consumed by the dashboards and `/api/calendar` routes. No Cal.com/cal.diy service is required.
 
-All dated sessions are stored as UTC timestamps and displayed in the browser's local timezone. Existing Supabase RLS policies and booking uniqueness constraints remain responsible for authorization and concurrent booking conflicts. This UI change does not alter the remote database schema or policies.
+Apply `supabase/migrations/20261001110024_native_calendar_booking.sql` before deploying this feature. The migration preserves existing records, adds published teacher profiles and booking metadata, and routes booking writes through authorized, conflict-checked transactions. See [native calendar design and setup](docs/native-calendar.md).
+
+Sessions are stored as UTC instants. Weekly hours use IANA timezones, including DST. Optional server-only provider credentials are documented in `.env.example`; missing credentials never produce fake meeting or calendar confirmations. ICS downloads work without provider credentials.
+
+Run all isolated calendar checks with `pnpm test:calendar` (Node 22.15+), type-check with `pnpm exec tsc --noEmit`, and build with `pnpm run build`. If the local environment blocks Turbopack workers, use `pnpm exec next build --webpack` for the production check.
 
 ## Learn More
 

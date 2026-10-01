@@ -8,34 +8,8 @@ export type CalendarProps = {
   profileId: string
   isAdminView?: boolean
 }
-export type Session = {
-  id: string
-  teacher_id: string
-  title: string
-  starts_at: string
-  ends_at: string
-  status: string
-  topic: string | null
-  notes: string | null
-}
-export type Booking = {
-  id: string
-  session_id: string
-  status: string
-  topic: string | null
-  notes: string | null
-  class_sessions: Session | null
-}
-export type Availability = {
-  id: string
-  day_of_week: number
-  start_time: string
-  end_time: string
-  timezone: string
-  is_active: boolean
-}
-export const sessionFields =
-  'id, teacher_id, title, starts_at, ends_at, status, topic, notes'
+export type { Session, Booking, Availability } from '@/lib/calendar/types'
+export { sessionFields } from '@/lib/calendar/types'
 export const formatTime = (value: string | Date) =>
   new Intl.DateTimeFormat(undefined, {
     hour: 'numeric',
